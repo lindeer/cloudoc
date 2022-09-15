@@ -1,6 +1,5 @@
+import 'package:cloudoc/file_entity.dart';
 import 'package:flutter/material.dart';
-
-import 'file_entity.dart';
 
 void main() {
   runApp(const _FileExplorer());
