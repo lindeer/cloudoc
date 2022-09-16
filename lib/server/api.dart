@@ -21,18 +21,22 @@ Handler _createModelHandler(String name, String dir) {
   final root = rootDir.resolveSymbolicLinksSync();
 
   return (Request req) {
-    final r = req.change(path: name);
+    final r = req.change(path: 'api/$name');
     final fsPath = p.join(root, r.url.path);
     final entityType = FileSystemEntity.typeSync(fsPath);
-    if (entityType != FileSystemEntityType.directory) {
-      return Response.notFound('Not Found: error type');
+    switch (entityType) {
+      case FileSystemEntityType.directory: break;
+      case FileSystemEntityType.notFound:
+        return Response.notFound('Not Found: "${req.url.path}"');
+      default:
+        return Response.badRequest(body: 'Bad Request: "${req.url.path}"');
     }
     final entities = listEntities(Directory(fsPath), '$dir/static');
     return Result.ok(entities);
   };
 }
 
-Handler compose(String root) {
+Handler serve(String root) {
   final router = Router();
   for (final name in _staticDataDirectories) {
     final handler = createStaticHandler('$root/static/$name');
@@ -42,7 +46,6 @@ Handler compose(String root) {
     });
   }
 
-  router.get('/desktop', _createModelHandler('desktop', root));
-  router.get('/', (Request req) => Response.movedPermanently('/desktop'));
+  router.get('/api/desktop<path|.*>', _createModelHandler('desktop', root));
   return router;
 }

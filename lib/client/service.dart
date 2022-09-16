@@ -11,7 +11,7 @@ class Service {
   Service(this.authority);
 
   Future<List<FileEntity>> listEntities(String path) async {
-    final res = await http.get(Uri.http(authority, path));
+    final res = await http.get(Uri.http(authority, 'api/$path'));
     if (res.statusCode == HttpStatus.ok) {
       final body = json.decode(res.body) as Map<String, dynamic>;
       final list = body['data'] as List<dynamic>;

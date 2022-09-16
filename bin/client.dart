@@ -44,7 +44,7 @@ class _BrowserPageState extends State<_BrowserPage> {
 
   void _enterFolder(String entry) async {
     _pathStack.add(entry);
-    _title.value = '/${_pathStack.join('/')}';
+    _title.value = _pathStack.join('/');
     final entities = await _service.listEntities(_title.value);
     _entities..clear()..addAll(entities);
     setState(() {
