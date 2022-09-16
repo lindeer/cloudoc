@@ -20,6 +20,7 @@ class _FileExplorer extends StatelessWidget {
         iconTheme: iconTheme.copyWith(color: Colors.orange),
       ),
       home: const _BrowserPage(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
@@ -40,8 +41,8 @@ enum _LoadingState {
 class _BrowserPageState extends State<_BrowserPage> {
   final _pathStack = <String>[];
   final _entities = <FileEntity>[];
-  final _title = ValueNotifier('');
   final _loadingNotifier = ValueNotifier(_LoadingState.loading);
+  final _pathChanged = ValueNotifier(0);
   final _service = Service("0.0.0.0:8989");
 
   @override
@@ -51,12 +52,22 @@ class _BrowserPageState extends State<_BrowserPage> {
     _enterFolder('desktop');
   }
 
-  void _enterFolder(String entry) async {
+  void _enterFolder(String entry) {
     _pathStack.add(entry);
-    _title.value = _pathStack.join('/');
+    _onPathChange();
+  }
+
+  void _back() {
+    _pathStack.removeLast();
+    _onPathChange();
+  }
+
+  void _onPathChange() async {
+    _pathChanged.value++;
+    final path = _pathStack.join('/');
     _loadingNotifier.value = _LoadingState.loading;
     try {
-      final entities = await _service.listEntities(_title.value);
+      final entities = await _service.listEntities(path);
       _entities..clear()..addAll(entities);
       _loadingNotifier.value = _LoadingState.done;
     } on Exception catch (_) {
@@ -87,11 +98,22 @@ class _BrowserPageState extends State<_BrowserPage> {
     return Scaffold(
       appBar: AppBar(
         foregroundColor: Colors.white,
-        title: ValueListenableBuilder<String>(
-          valueListenable: _title,
+        title: ValueListenableBuilder<int>(
+          valueListenable: _pathChanged,
           builder: (ctx, value, _) {
-            return Text(value);
+            return Text('/${_pathStack.join('/')}');
           },
+        ),
+        leading: ValueListenableBuilder<int>(
+          valueListenable: _pathChanged,
+          builder: (ctx, value, child) {
+            final canBack = _pathStack.length > 1;
+            return IconButton(
+              icon: child!,
+              onPressed: canBack ? _back : null,
+            );
+          },
+          child: const Icon(Icons.arrow_back),
         ),
       ),
       body: Center(
