@@ -23,3 +23,7 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  fonts:
+    - family:  FontAwesome4
+      fonts:
+        - asset: fonts/FontAwesome4.ttf

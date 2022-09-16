@@ -1,5 +1,7 @@
+import 'package:cloudoc/client/expand_fab.dart';
 import 'package:cloudoc/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/client/font_awesome4_icons.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -75,9 +77,6 @@ class _BrowserPageState extends State<_BrowserPage> {
     }
   }
 
-  void _onNewMenu() {
-  }
-
   void _onClickItem(FileEntity entity) {
     _enterFolder(entity.name);
   }
@@ -91,6 +90,10 @@ class _BrowserPageState extends State<_BrowserPage> {
         onTap: entity.isDirectory ? () => _onClickItem(entity) : null,
       ),
     );
+  }
+
+  void _onClickAction(BuildContext context, int position) {
+    print("_onClickAction: $position");
   }
 
   @override
@@ -128,7 +131,7 @@ class _BrowserPageState extends State<_BrowserPage> {
                     message: 'load failed!',
                   );
                 case _LoadingState.loading:
-                  return Container(
+                  return SizedBox(
                     width: 56,
                     height: 56,
                     child: CircularProgressIndicator(),
@@ -144,12 +147,26 @@ class _BrowserPageState extends State<_BrowserPage> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _onNewMenu,
-        tooltip: 'Increment',
-        foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      floatingActionButton: ExpandFab(
+        distance: 140.0,
+        children: List<Widget>.generate(_menus.length, (i) {
+          return ActionItemButton(
+            onPressed: () => _onClickAction(context, i),
+            icon: Icon(
+              _menus[i],
+              color: Colors.white,
+            ),
+          );
+        }),
+      ),
     );
   }
 }
+
+const _menus = [
+  FontAwesome4.folder_create,
+  FontAwesome4.file_word,
+  FontAwesome4.file_excel,
+  FontAwesome4.file_powerpoint,
+  FontAwesome4.file_upload,
+];
