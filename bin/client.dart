@@ -31,10 +31,17 @@ class _BrowserPage extends StatefulWidget {
   State<_BrowserPage> createState() => _BrowserPageState();
 }
 
+enum _LoadingState {
+  loading,
+  done,
+  error,
+}
+
 class _BrowserPageState extends State<_BrowserPage> {
   final _pathStack = <String>[];
   final _entities = <FileEntity>[];
   final _title = ValueNotifier('');
+  final _loadingNotifier = ValueNotifier(_LoadingState.loading);
   final _service = Service("0.0.0.0:8989");
 
   @override
@@ -47,10 +54,14 @@ class _BrowserPageState extends State<_BrowserPage> {
   void _enterFolder(String entry) async {
     _pathStack.add(entry);
     _title.value = _pathStack.join('/');
-    final entities = await _service.listEntities(_title.value);
-    _entities..clear()..addAll(entities);
-    setState(() {
-    });
+    _loadingNotifier.value = _LoadingState.loading;
+    try {
+      final entities = await _service.listEntities(_title.value);
+      _entities..clear()..addAll(entities);
+      _loadingNotifier.value = _LoadingState.done;
+    } on Exception catch (_) {
+      _loadingNotifier.value = _LoadingState.error;
+    }
   }
 
   void _onNewMenu() {
@@ -86,9 +97,28 @@ class _BrowserPageState extends State<_BrowserPage> {
       body: Center(
         child: FractionallySizedBox(
           widthFactor: 0.7,
-          child: ListView.builder(
-            itemCount: _entities.length,
-            itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _entities[index]),
+          child: ValueListenableBuilder<_LoadingState>(
+            valueListenable: _loadingNotifier,
+            builder: (ctx, value, _) {
+              switch (value) {
+                case _LoadingState.error:
+                  return ErrorWidget.withDetails(
+                    message: 'load failed!',
+                  );
+                case _LoadingState.loading:
+                  return Container(
+                    width: 56,
+                    height: 56,
+                    child: CircularProgressIndicator(),
+                  );
+                default:
+                  break;
+              }
+              return ListView.builder(
+                itemCount: _entities.length,
+                itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _entities[index]),
+              );
+            },
           ),
         ),
       ),
