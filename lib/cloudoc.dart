@@ -26,7 +26,7 @@ List<FileEntity> listEntities(Directory dir, String refDir) {
     final isDir = FileSystemEntity.isDirectorySync(refPath);
     final suffix = isDir ? '/' : '';
     final name = '${p.relative(e.path, from: dirPath)}$suffix';
-    final sanitizedName = _sanitizer.convert(name);
+    final sanitizedName = name;
 
     final file = FileSystemEntity.isFileSync(refPath) ? File(refPath)
         : isDir ? Directory(refPath)

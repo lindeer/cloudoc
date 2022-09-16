@@ -12,10 +12,12 @@ class _FileExplorer extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    final iconTheme = IconTheme.of(context);
     return MaterialApp(
       title: 'My Document Center',
       theme: ThemeData(
         primarySwatch: Colors.orange,
+        iconTheme: iconTheme.copyWith(color: Colors.orange),
       ),
       home: const _BrowserPage(),
     );
@@ -54,9 +56,18 @@ class _BrowserPageState extends State<_BrowserPage> {
   void _onNewMenu() {
   }
 
+  void _onClickItem(FileEntity entity) {
+    _enterFolder(entity.name);
+  }
+
   Widget _buildEntityWidget(BuildContext context, FileEntity entity) {
-    return ListTile(
-      title: Text(entity.name),
+    final icon = entity.isDirectory ? Icons.folder : Icons.file_copy_outlined;
+    return Card(
+      child: ListTile(
+        leading: Icon(icon, color: Colors.orange,),
+        title: Text(entity.name),
+        onTap: entity.isDirectory ? () => _onClickItem(entity) : null,
+      ),
     );
   }
 
@@ -64,6 +75,7 @@ class _BrowserPageState extends State<_BrowserPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        foregroundColor: Colors.white,
         title: ValueListenableBuilder<String>(
           valueListenable: _title,
           builder: (ctx, value, _) {
@@ -83,6 +95,7 @@ class _BrowserPageState extends State<_BrowserPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: _onNewMenu,
         tooltip: 'Increment',
+        foregroundColor: Colors.white,
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
