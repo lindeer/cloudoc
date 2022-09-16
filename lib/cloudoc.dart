@@ -24,8 +24,7 @@ List<FileEntity> listEntities(Directory dir, String refDir) {
   return items.map((e) {
     final refPath = e.resolveSymbolicLinksSync();
     final isDir = FileSystemEntity.isDirectorySync(refPath);
-    final suffix = isDir ? '/' : '';
-    final name = '${p.relative(e.path, from: dirPath)}$suffix';
+    final name = p.relative(e.path, from: dirPath);
     final sanitizedName = name;
 
     final file = FileSystemEntity.isFileSync(refPath) ? File(refPath)
