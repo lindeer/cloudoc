@@ -7,7 +7,7 @@ import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
 
 import '../cloudoc.dart';
-import 'model.dart';
+import '../model.dart';
 
 const _staticDataDirectories = {
   'docs',

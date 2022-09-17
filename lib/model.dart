@@ -1,7 +1,7 @@
 import 'dart:convert' show json;
 
 import 'package:shelf/shelf.dart' show Response;
-import '../file_entity.dart';
+import 'file_entity.dart';
 
 class Result {
   final int code;
