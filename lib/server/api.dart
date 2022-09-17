@@ -7,6 +7,7 @@ import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
 
 import '../cloudoc.dart';
+import '../file_entity.dart';
 import '../model.dart';
 
 const _staticDataDirectories = {
@@ -47,5 +48,24 @@ Handler serve(String root) {
   }
 
   router.get('/api/desktop<path|.*>', _createModelHandler('desktop', root));
+
+  router.post('/api/create', (Request req) async {
+    final reqBean = RequestBodyCreate.fromJson(await req.readAsString());
+    String parent = p.dirname(reqBean.path);
+    if (parent.startsWith('/')) {
+      parent = parent.substring(1);
+    }
+    final fsDir = p.join(root, parent);
+    if (!FileSystemEntity.isDirectorySync(fsDir)) {
+      return Response.badRequest(body: "path '$parent' is not directory!");
+    }
+    final type = FileEntity.of(reqBean.type);
+    if (type == EntityType.folder) {
+      Directory(p.join(fsDir, p.basename(reqBean.path))).createSync();
+      final entities = listEntities(Directory(fsDir), root);
+      return Result.ok(entities);
+    }
+    return Response.badRequest(body: "type '$type' is illegal!");
+  });
   return router;
 }

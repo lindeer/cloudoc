@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cloudoc/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc/server/api.dart' as api;
@@ -12,6 +14,13 @@ void main() async {
   const port = 8964;
   await io.serve(handler, '0.0.0.0', port);
   final service = Service('0.0.0.0:$port');
+
+  const folder = 'new1';
+  final d = Directory('test/_test_/desktop/$folder');
+  if (d.existsSync()) {
+    d.deleteSync();
+  }
+
   test('test list api', () async {
     final entities = await service.listEntities('desktop');
     expect(entities.length, 2);
@@ -25,5 +34,12 @@ void main() async {
     expect(entities.length, 1);
     expect(entities.first.type, EntityType.unknown);
     expect(entities.first.name, 'heart.txt');
+  });
+
+  test('test create folder', () async {
+    final entities = await service.create('desktop/$folder', 'folder');
+    expect(entities.length, 3);
+    final remote = entities.firstWhere((e) => e.name == folder);
+    expect(remote.type, EntityType.folder);
   });
 }
