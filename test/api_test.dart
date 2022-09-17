@@ -12,7 +12,7 @@ void main() async {
       .addMiddleware(logRequests())
       .addHandler(api.serve('test/_test_'));
   const port = 8964;
-  await io.serve(handler, '0.0.0.0', port);
+  final server = await io.serve(handler, '0.0.0.0', port);
   final service = Service('0.0.0.0:$port');
 
   const folder = 'new1';
@@ -41,5 +41,9 @@ void main() async {
     expect(entities.length, 3);
     final remote = entities.firstWhere((e) => e.name == folder);
     expect(remote.type, EntityType.folder);
+  });
+
+  tearDownAll(() {
+    server.close(force: true);
   });
 }
