@@ -3,9 +3,16 @@ import 'dart:convert' show json;
 import 'package:shelf/shelf.dart' show Response;
 import 'file_entity.dart';
 
-class Result {
+typedef JsonEncoder<T> = Map<String, dynamic> Function(T obj);
+typedef JsonDecoder<T> = T Function(dynamic obj);
+
+final _jsonConverters = <Type, JsonDecoder>{
+  FileEntity: (dynamic obj) => FileEntity.fromJson(obj),
+};
+
+class Result<T> {
   final int code;
-  final Object data;
+  final T data;
 
   Result(this.code, this.data);
 
@@ -13,13 +20,35 @@ class Result {
     'code': code,
     'data': data,
   }, toEncodable: (e) {
-    if (e is FileEntity) {
+    try {
       return e.toJson();
+    } on Error catch (_) {
+      return null;
     }
-    return null;
   });
 
-  static Response ok(Object data) => Response.ok(
+  static Result<List<E>> listFrom<E>(String str) {
+    final body = json.decode(str) as Map<String, dynamic>;
+    final list = body['data'] as List<dynamic>;
+    final converter = _jsonConverters[E] as JsonDecoder<E>;
+    final items = list.map(converter).toList(growable: false);
+    return Result<List<E>>(
+      body['code'] ?? -1,
+      items,
+    );
+  }
+
+  static Result<R> from<R>(String str) {
+    final body = json.decode(str) as Map<String, dynamic>;
+    final converter = _jsonConverters[R] as JsonDecoder<R>;
+    final R obj = converter(body['data']);
+    return Result<R>(
+      body['code'] ?? -1,
+      obj,
+    );
+  }
+
+  static Response ok<R>(R data) => Response.ok(
     Result(0, data).toJson(),
     headers: {
       'Content-type':'application/json',

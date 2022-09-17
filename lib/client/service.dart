@@ -1,4 +1,3 @@
-import 'dart:convert' show json;
 import 'dart:io' show HttpStatus;
 
 import 'package:path/path.dart' as p;
@@ -15,12 +14,8 @@ class Service {
   Future<List<FileEntity>> listEntities(String path) async {
     final res = await http.get(Uri.http(authority, 'api/$path'));
     if (res.statusCode == HttpStatus.ok) {
-      final body = json.decode(res.body) as Map<String, dynamic>;
-      final list = body['data'] as List<dynamic>;
-      return list.map((e) {
-        final map = e as Map<String, dynamic>;
-        return FileEntity.fromJson(map);
-      }).toList(growable: false);
+      final result = Result.listFrom<FileEntity>(res.body);
+      return result.data;
     } else {
       throw Exception("Failed to fetch entities from '$path'");
     }
@@ -35,12 +30,8 @@ class Service {
       body: RequestBodyCreate(path: path, type: type).toJson(),
     );
     if (res.statusCode == HttpStatus.ok) {
-      final body = json.decode(res.body) as Map<String, dynamic>;
-      final list = body['data'] as List<dynamic>;
-      return list.map((e) {
-        final map = e as Map<String, dynamic>;
-        return FileEntity.fromJson(map);
-      }).toList(growable: false);
+      final result = Result.listFrom<FileEntity>(res.body);
+      return result.data;
     } else {
       throw Exception("Failed to create '$type' ${p.basename(path)}");
     }

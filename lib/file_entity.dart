@@ -37,7 +37,7 @@ class FileEntity {
     );
   }
 
-  FileEntity.fromJson(Map<String, dynamic> json): this(
+  FileEntity.fromJson(dynamic json): this(
     name: json['name']!,
     lastUpdated: json['updated']!,
     size: json['size']!,
