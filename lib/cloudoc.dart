@@ -1,6 +1,6 @@
 
 import 'dart:convert' show HtmlEscape;
-import 'dart:io' show Directory, File, FileSystemEntity;
+import 'dart:io' show Directory, File, FileStat, FileSystemEntity;
 import 'package:path/path.dart' as p;
 
 import 'file_entity.dart';
@@ -40,8 +40,25 @@ List<FileEntity> listEntities(Directory dir, String refDir) {
       name: sanitizedName,
       lastUpdated: stat.modified.millisecondsSinceEpoch,
       size: stat.size,
-      isDirectory: isDir,
+      type: isDir ? EntityType.folder : _guessFileType(name, stat),
       path: path,
     );
   }).whereType<FileEntity>().toList(growable: false);
+}
+
+EntityType _guessFileType(String filename, FileStat stat) {
+  int pos = filename.lastIndexOf('.');
+  final ext = pos < 0 ? null : filename.substring(pos + 1);
+  switch (ext) {
+    case 'doc':
+    case 'docx':
+      return EntityType.doc;
+    case 'xls':
+    case 'xlsx':
+      return EntityType.sheet;
+    case 'ppt':
+    case 'pptx':
+      return EntityType.slide;
+  }
+  return EntityType.unknown;
 }

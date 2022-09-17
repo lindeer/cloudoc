@@ -61,7 +61,13 @@ class FileBrowserModel {
   }
 
   void onEntityClicked(FileEntity entity) {
-    enter(entity.name);
+    switch (entity.type) {
+      case EntityType.folder:
+        enter(entity.name);
+        break;
+      default:
+        break;
+    }
   }
 
   void createFolder(String name) async {

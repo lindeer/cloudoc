@@ -1,17 +1,24 @@
 
+enum EntityType {
+  unknown,
+  folder,
+  doc,
+  sheet,
+  slide,
+}
 
 class FileEntity {
   final String name;
   final int lastUpdated;
   final int size;
-  final bool isDirectory;
+  final EntityType type;
   final String? path;
 
   const FileEntity({
     required this.name,
     required this.lastUpdated,
     required this.size,
-    required this.isDirectory,
+    required this.type,
     this.path,
   });
 
@@ -19,16 +26,22 @@ class FileEntity {
     'name': name,
     'updated': lastUpdated,
     'size': size,
-    'is_directory': isDirectory,
+    'type': type.name,
     if (path != null)
       'path': path,
   };
+
+  static EntityType of(String? name) {
+    return EntityType.values.firstWhere((e) => e.name == name,
+      orElse: () => EntityType.unknown,
+    );
+  }
 
   FileEntity.fromJson(Map<String, dynamic> json): this(
     name: json['name']!,
     lastUpdated: json['updated']!,
     size: json['size']!,
-    isDirectory: json['is_directory']!,
+    type: of(json['type']!),
     path: json['path'],
   );
 }

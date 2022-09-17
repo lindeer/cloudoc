@@ -96,13 +96,23 @@ class _BrowserPageState extends State<_BrowserPage> {
     }
   }
 
+  static const _fileIcons = {
+    EntityType.unknown: Icons.file_copy_outlined,
+    EntityType.folder: Icons.folder_outlined,
+    EntityType.doc: FontAwesome4.file_word,
+    EntityType.sheet: FontAwesome4.file_excel,
+    EntityType.slide: FontAwesome4.file_powerpoint,
+  };
+
   Widget _buildEntityWidget(BuildContext context, FileEntity entity) {
-    final icon = entity.isDirectory ? Icons.folder : Icons.file_copy_outlined;
+    final icon = _fileIcons[entity.type] ?? Icons.file_copy_outlined;
     return Card(
       child: ListTile(
         leading: Icon(icon, color: Colors.orange,),
         title: Text(entity.name),
-        onTap: entity.isDirectory ? () => _model.onEntityClicked(entity) : null,
+        onTap: entity.type != EntityType.unknown
+            ? () => _model.onEntityClicked(entity)
+            : null,
       ),
     );
   }
