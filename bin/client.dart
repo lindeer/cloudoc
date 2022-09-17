@@ -120,32 +120,7 @@ class _BrowserPageState extends State<_BrowserPage> {
         ),
       ),
       body: Center(
-        child: FractionallySizedBox(
-          widthFactor: 0.7,
-          child: ValueListenableBuilder<_LoadingState>(
-            valueListenable: _loadingNotifier,
-            builder: (ctx, value, _) {
-              switch (value) {
-                case _LoadingState.error:
-                  return ErrorWidget.withDetails(
-                    message: 'load failed!',
-                  );
-                case _LoadingState.loading:
-                  return SizedBox(
-                    width: 56,
-                    height: 56,
-                    child: CircularProgressIndicator(),
-                  );
-                default:
-                  break;
-              }
-              return ListView.builder(
-                itemCount: _entities.length,
-                itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _entities[index]),
-              );
-            },
-          ),
-        ),
+        child: _makeBody(context),
       ),
       floatingActionButton: ExpandFab(
         distance: 140.0,
@@ -159,6 +134,48 @@ class _BrowserPageState extends State<_BrowserPage> {
           );
         }),
       ),
+    );
+  }
+
+  Widget _makeBody(BuildContext context) {
+    return ValueListenableBuilder<_LoadingState>(
+      valueListenable: _loadingNotifier,
+      child: const SizedBox(
+        width: 56,
+        height: 56,
+        child: CircularProgressIndicator(),
+      ),
+      builder: (ctx, value, child) {
+        switch (value) {
+          case _LoadingState.error:
+            return ErrorWidget.withDetails(
+              message: 'load failed!',
+            );
+          case _LoadingState.loading:
+            return child!;
+          default:
+            break;
+        }
+        if (_entities.isEmpty) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: const [
+              Icon(
+                Icons.create_rounded,
+                size: 56,
+              ),
+              Text('Press add button to create new files'),
+            ],
+          );
+        }
+        return FractionallySizedBox(
+          widthFactor: 0.7,
+          child: ListView.builder(
+            itemCount: _entities.length,
+            itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _entities[index]),
+          ),
+        );
+      },
     );
   }
 }
