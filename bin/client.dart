@@ -1,5 +1,6 @@
 import 'package:cloudoc/client/expand_fab.dart';
 import 'package:cloudoc/client/service.dart';
+import 'package:cloudoc/client/view_model.dart';
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc/client/font_awesome4_icons.dart';
 import 'package:flutter/material.dart';
@@ -34,51 +35,17 @@ class _BrowserPage extends StatefulWidget {
   State<_BrowserPage> createState() => _BrowserPageState();
 }
 
-enum _LoadingState {
-  loading,
-  done,
-  error,
-}
-
 class _BrowserPageState extends State<_BrowserPage> {
-  final _pathStack = <String>[];
-  final _entities = <FileEntity>[];
-  final _loadingNotifier = ValueNotifier(_LoadingState.loading);
-  final _pathChanged = ValueNotifier(0);
-  final _service = Service("0.0.0.0:8989");
-
+  final _model = FileBrowserModel(Service("0.0.0.0:8989"));
+  late final ValueNotifier<int> _pathChanged;
+  late final ValueNotifier<LoadingState> _loadingNotifier;
   @override
   void initState() {
     super.initState();
 
-    _enterFolder('desktop');
-  }
-
-  void _enterFolder(String entry) {
-    _pathStack.add(entry);
-    _onPathChange();
-  }
-
-  void _back() {
-    _pathStack.removeLast();
-    _onPathChange();
-  }
-
-  void _onPathChange() async {
-    _pathChanged.value++;
-    final path = _pathStack.join('/');
-    _loadingNotifier.value = _LoadingState.loading;
-    try {
-      final entities = await _service.listEntities(path);
-      _entities..clear()..addAll(entities);
-      _loadingNotifier.value = _LoadingState.done;
-    } on Exception catch (_) {
-      _loadingNotifier.value = _LoadingState.error;
-    }
-  }
-
-  void _onClickItem(FileEntity entity) {
-    _enterFolder(entity.name);
+    _pathChanged = _model.pathChanged;
+    _loadingNotifier = _model.loadingNotifier;
+    _model.enter('desktop');
   }
 
   Widget _buildEntityWidget(BuildContext context, FileEntity entity) {
@@ -87,7 +54,7 @@ class _BrowserPageState extends State<_BrowserPage> {
       child: ListTile(
         leading: Icon(icon, color: Colors.orange,),
         title: Text(entity.name),
-        onTap: entity.isDirectory ? () => _onClickItem(entity) : null,
+        onTap: entity.isDirectory ? () => _model.onEntityClicked(entity) : null,
       ),
     );
   }
@@ -104,16 +71,16 @@ class _BrowserPageState extends State<_BrowserPage> {
         title: ValueListenableBuilder<int>(
           valueListenable: _pathChanged,
           builder: (ctx, value, _) {
-            return Text('/${_pathStack.join('/')}');
+            return Text('/${_model.path}');
           },
         ),
         leading: ValueListenableBuilder<int>(
           valueListenable: _pathChanged,
           builder: (ctx, value, child) {
-            final canBack = _pathStack.length > 1;
+            final canBack = _model.depth > 1;
             return IconButton(
               icon: child!,
-              onPressed: canBack ? _back : null,
+              onPressed: canBack ? _model.back : null,
             );
           },
           child: const Icon(Icons.arrow_back),
@@ -138,7 +105,7 @@ class _BrowserPageState extends State<_BrowserPage> {
   }
 
   Widget _makeBody(BuildContext context) {
-    return ValueListenableBuilder<_LoadingState>(
+    return ValueListenableBuilder<LoadingState>(
       valueListenable: _loadingNotifier,
       child: const SizedBox(
         width: 56,
@@ -147,21 +114,22 @@ class _BrowserPageState extends State<_BrowserPage> {
       ),
       builder: (ctx, value, child) {
         switch (value) {
-          case _LoadingState.error:
+          case LoadingState.error:
             return ErrorWidget.withDetails(
               message: 'load failed!',
             );
-          case _LoadingState.loading:
+          case LoadingState.loading:
             return child!;
           default:
             break;
         }
-        if (_entities.isEmpty) {
+        final size = _model.size;
+        if (size == 0) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: const [
               Icon(
-                Icons.create_rounded,
+                Icons.add_circle,
                 size: 56,
               ),
               Text('Press add button to create new files'),
@@ -171,8 +139,8 @@ class _BrowserPageState extends State<_BrowserPage> {
         return FractionallySizedBox(
           widthFactor: 0.7,
           child: ListView.builder(
-            itemCount: _entities.length,
-            itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _entities[index]),
+            itemCount: size,
+            itemBuilder: (ctx, index) => _buildEntityWidget(ctx, _model[index]),
           ),
         );
       },
