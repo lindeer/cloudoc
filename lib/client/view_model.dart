@@ -10,6 +10,14 @@ enum LoadingState {
   error,
 }
 
+enum EntityAction {
+  createFolder,
+  createDoc,
+  createSheet,
+  createSlide,
+  upload,
+}
+
 class FileBrowserModel {
   final _pathStack = <String>[];
   final _entities = <FileEntity>[];
@@ -54,5 +62,8 @@ class FileBrowserModel {
 
   void onEntityClicked(FileEntity entity) {
     enter(entity.name);
+  }
+
+  void createFolder(String name) async {
   }
 }

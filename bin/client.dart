@@ -48,6 +48,54 @@ class _BrowserPageState extends State<_BrowserPage> {
     _model.enter('desktop');
   }
 
+  void _onClickAction(BuildContext context, EntityAction action) {
+    switch (action) {
+      case EntityAction.createFolder:
+        _createFolder(context);
+        break;
+      case EntityAction.createDoc:
+        break;
+      case EntityAction.createSheet:
+        break;
+      case EntityAction.createSlide:
+        break;
+      case EntityAction.upload:
+        break;
+    }
+  }
+
+  void _createFolder(BuildContext context) async {
+    final controller = TextEditingController();
+    final folderName = await showDialog<String>(
+      context: context,
+      builder: (ctx) {
+        return AlertDialog(
+          title: Text('Create a new folder'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              border: UnderlineInputBorder(),
+              prefixIcon: Icon(Icons.edit),
+              hintText: 'Enter folder name',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                final text = controller.text;
+                Navigator.of(ctx).pop(text);
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+    if (folderName != null && folderName.trim().isNotEmpty) {
+      _model.createFolder(folderName.trim());
+    }
+  }
+
   Widget _buildEntityWidget(BuildContext context, FileEntity entity) {
     final icon = entity.isDirectory ? Icons.folder : Icons.file_copy_outlined;
     return Card(
@@ -57,10 +105,6 @@ class _BrowserPageState extends State<_BrowserPage> {
         onTap: entity.isDirectory ? () => _model.onEntityClicked(entity) : null,
       ),
     );
-  }
-
-  void _onClickAction(BuildContext context, int position) {
-    print("_onClickAction: $position");
   }
 
   @override
@@ -91,17 +135,28 @@ class _BrowserPageState extends State<_BrowserPage> {
       ),
       floatingActionButton: ExpandFab(
         distance: 140.0,
-        children: List<Widget>.generate(_menus.length, (i) {
-          return ActionItemButton(
-            onPressed: () => _onClickAction(context, i),
-            icon: Icon(
-              _menus[i],
-              color: Colors.white,
-            ),
-          );
-        }),
+        children: _createActionButtons(context),
       ),
     );
+  }
+
+  List<Widget> _createActionButtons(BuildContext context) {
+    const icons = {
+      EntityAction.createFolder: FontAwesome4.folder_create,
+      EntityAction.createDoc: FontAwesome4.file_word,
+      EntityAction.createSheet: FontAwesome4.file_excel,
+      EntityAction.createSlide: FontAwesome4.file_powerpoint,
+      EntityAction.upload: FontAwesome4.file_upload,
+    };
+    return icons.entries.map((e) {
+      return ActionItemButton(
+        onPressed: () => _onClickAction(context, e.key),
+        icon: Icon(
+          e.value,
+          color: Colors.white,
+        ),
+      );
+    }).toList(growable: false);
   }
 
   Widget _makeBody(BuildContext context) {
@@ -147,11 +202,3 @@ class _BrowserPageState extends State<_BrowserPage> {
     );
   }
 }
-
-const _menus = [
-  FontAwesome4.folder_create,
-  FontAwesome4.file_word,
-  FontAwesome4.file_excel,
-  FontAwesome4.file_powerpoint,
-  FontAwesome4.file_upload,
-];
