@@ -23,6 +23,7 @@ class FileBrowserModel {
   final _entities = <FileEntity>[];
   final loadingNotifier = ValueNotifier(LoadingState.loading);
   final pathChanged = ValueNotifier(0);
+  final toastNotifier = ValueNotifier<String?>(null);
   final Service _service;
   String? _errorMsg;
 
@@ -40,6 +41,12 @@ class FileBrowserModel {
 
   FileEntity operator[](int pos) => _entities[pos];
 
+  void dispose() {
+    loadingNotifier.dispose();
+    pathChanged.dispose();
+    toastNotifier.dispose();
+  }
+
   void enter(String entry) {
     _pathStack.add(entry);
     _onPathChange();
@@ -53,16 +60,23 @@ class FileBrowserModel {
   void _onPathChange() async {
     pathChanged.value++;
     final path = _pathStack.join('/');
+    _onEntitiesChanged(() => _service.listEntities(path));
+  }
+
+  Future<bool> _onEntitiesChanged(Future<List<FileEntity>> Function() cb) async {
     loadingNotifier.value = LoadingState.loading;
+    bool ok = true;
     try {
-      final entities = await _service.listEntities(path);
+      final entities = await cb();
       _entities..clear()..addAll(entities);
       loadingNotifier.value = LoadingState.done;
       _errorMsg = null;
     } on Exception catch (e) {
       _errorMsg = e.toString();
       loadingNotifier.value = LoadingState.error;
+      ok = false;
     }
+    return ok;
   }
 
   void onEntityClicked(FileEntity entity) {
@@ -76,5 +90,10 @@ class FileBrowserModel {
   }
 
   void createFolder(String name) async {
+    final path = [..._pathStack, name].join('/');
+    final ok = await _onEntitiesChanged(() => _service.create(path, "folder"));
+    if (ok) {
+      toastNotifier.value = 'create folder $name successfully!';
+    }
   }
 }

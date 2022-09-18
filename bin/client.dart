@@ -45,7 +45,28 @@ class _BrowserPageState extends State<_BrowserPage> {
 
     _pathChanged = _model.pathChanged;
     _loadingNotifier = _model.loadingNotifier;
+    _model.toastNotifier.addListener(_onShowToast);
     _model.enter('desktop');
+  }
+
+  @override
+  void dispose() {
+    _model.dispose();
+
+    super.dispose();
+  }
+
+  void _onShowToast() {
+    final message = _model.toastNotifier.value;
+    if (message == null) {
+      return;
+    }
+    final scaffold = ScaffoldMessenger.of(context);
+    scaffold.showSnackBar(
+      SnackBar(
+        content: Text(message),
+      ),
+    );
   }
 
   void _onClickAction(BuildContext context, EntityAction action) {
