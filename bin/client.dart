@@ -42,7 +42,6 @@ class _BrowserPageState extends State<_BrowserPage> {
   void initState() {
     super.initState();
 
-    _model.toastNotifier.addListener(_onShowToast);
     _model.enter('desktop');
   }
 
@@ -53,11 +52,7 @@ class _BrowserPageState extends State<_BrowserPage> {
     super.dispose();
   }
 
-  void _onShowToast() {
-    final message = _model.toastNotifier.value;
-    if (message == null) {
-      return;
-    }
+  void _showToast(String message) {
     final scaffold = ScaffoldMessenger.of(context);
     scaffold.showSnackBar(
       SnackBar(
@@ -109,8 +104,9 @@ class _BrowserPageState extends State<_BrowserPage> {
         );
       },
     );
-    if (folderName != null && folderName.trim().isNotEmpty) {
-      _model.createFolder(folderName.trim());
+    final name = folderName?.trim();
+    if (name != null && name.isNotEmpty && (await _model.createFolder(name))) {
+      _showToast('create folder $name successfully!');
     }
   }
 
