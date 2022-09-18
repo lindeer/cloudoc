@@ -181,7 +181,7 @@ class _BrowserPageState extends State<_BrowserPage> {
         switch (value) {
           case LoadingState.error:
             return ErrorWidget.withDetails(
-              message: 'load failed!',
+              message: 'load failed: ${_model.errorMessage}!',
             );
           case LoadingState.loading:
             return child!;

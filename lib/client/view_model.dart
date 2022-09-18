@@ -24,6 +24,7 @@ class FileBrowserModel {
   final loadingNotifier = ValueNotifier(LoadingState.loading);
   final pathChanged = ValueNotifier(0);
   final Service _service;
+  String? _errorMsg;
 
   FileBrowserModel(this._service);
 
@@ -34,6 +35,8 @@ class FileBrowserModel {
 
   /// count of entities
   int get size => _entities.length;
+
+  String? get errorMessage => _errorMsg;
 
   FileEntity operator[](int pos) => _entities[pos];
 
@@ -55,7 +58,9 @@ class FileBrowserModel {
       final entities = await _service.listEntities(path);
       _entities..clear()..addAll(entities);
       loadingNotifier.value = LoadingState.done;
-    } on Exception catch (_) {
+      _errorMsg = null;
+    } on Exception catch (e) {
+      _errorMsg = e.toString();
       loadingNotifier.value = LoadingState.error;
     }
   }
