@@ -3,6 +3,7 @@ import 'package:cloudoc/client/service.dart';
 import 'package:cloudoc/client/view_model.dart';
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc/client/font_awesome4_icons.dart';
+import 'package:file_picker/file_picker.dart' show FilePicker;
 import 'package:flutter/material.dart';
 
 void main() {
@@ -73,6 +74,7 @@ class _BrowserPageState extends State<_BrowserPage> {
       case EntityAction.createSlide:
         break;
       case EntityAction.upload:
+        _uploadFiles();
         break;
     }
   }
@@ -108,6 +110,16 @@ class _BrowserPageState extends State<_BrowserPage> {
     if (name != null && name.isNotEmpty && (await _model.createFolder(name))) {
       _showToast('create folder $name successfully!');
     }
+  }
+
+  void _uploadFiles() async {
+    final result = await FilePicker.platform.pickFiles(
+      allowMultiple: true,
+      withData: false,
+      withReadStream: true,
+    );
+    final files = result?.files.map((file) {
+    });
   }
 
   static const _fileIcons = {

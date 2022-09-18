@@ -8,3 +8,5 @@ pubspec.lock
 .idea/
 .metadata
 *.iml
+.flutter-plugins
+.flutter-plugins-dependencies
