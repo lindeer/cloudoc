@@ -37,14 +37,11 @@ class _BrowserPage extends StatefulWidget {
 
 class _BrowserPageState extends State<_BrowserPage> {
   final _model = FileBrowserModel(Service("0.0.0.0:8989"));
-  late final ValueNotifier<int> _pathChanged;
-  late final ValueNotifier<LoadingState> _loadingNotifier;
+
   @override
   void initState() {
     super.initState();
 
-    _pathChanged = _model.pathChanged;
-    _loadingNotifier = _model.loadingNotifier;
     _model.toastNotifier.addListener(_onShowToast);
     _model.enter('desktop');
   }
@@ -127,10 +124,11 @@ class _BrowserPageState extends State<_BrowserPage> {
 
   Widget _buildEntityWidget(BuildContext context, FileEntity entity) {
     final icon = _fileIcons[entity.type] ?? Icons.file_copy_outlined;
+    final suffix = entity.type == EntityType.folder ? '/' : '';
     return Card(
       child: ListTile(
         leading: Icon(icon, color: Colors.orange,),
-        title: Text(entity.name),
+        title: Text('${entity.name}$suffix'),
         onTap: entity.type != EntityType.unknown
             ? () => _model.onEntityClicked(entity)
             : null,
@@ -144,13 +142,13 @@ class _BrowserPageState extends State<_BrowserPage> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         title: ValueListenableBuilder<int>(
-          valueListenable: _pathChanged,
+          valueListenable: _model.pathChanged,
           builder: (ctx, value, _) {
             return Text('/${_model.path}');
           },
         ),
         leading: ValueListenableBuilder<int>(
-          valueListenable: _pathChanged,
+          valueListenable: _model.pathChanged,
           builder: (ctx, value, child) {
             final canBack = _model.depth > 1;
             return IconButton(
@@ -192,7 +190,7 @@ class _BrowserPageState extends State<_BrowserPage> {
 
   Widget _makeBody(BuildContext context) {
     return ValueListenableBuilder<LoadingState>(
-      valueListenable: _loadingNotifier,
+      valueListenable: _model.loadingNotifier,
       child: const SizedBox(
         width: 56,
         height: 56,
