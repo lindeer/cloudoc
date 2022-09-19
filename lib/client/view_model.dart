@@ -47,21 +47,23 @@ class FileBrowserModel {
 
   void enter(String entry) {
     _pathStack.add(entry);
-    _onPathChange();
+    _onPathChange('enter');
   }
 
   void back() {
     _pathStack.removeLast();
-    _onPathChange();
+    _onPathChange('back');
   }
 
-  void _onPathChange() async {
+  void _onPathChange(String reason) async {
     pathChanged.value++;
     final path = _pathStack.join('/');
-    _onEntitiesChanged(() => _service.listEntities(path));
+    _onEntitiesChanged(() => _service.listEntities(path), reason: reason);
   }
 
-  Future<bool> _onEntitiesChanged(Future<List<FileEntity>> Function() cb) async {
+  Future<bool> _onEntitiesChanged(Future<List<FileEntity>> Function() cb, {
+    String? reason,
+  }) async {
     loadingNotifier.value = LoadingState.loading;
     bool ok = true;
     try {
@@ -89,7 +91,7 @@ class FileBrowserModel {
 
   Future<bool> createFolder(String name) async {
     final path = [..._pathStack, name].join('/');
-    final ok = await _onEntitiesChanged(() => _service.create(path, "folder"));
+    final ok = await _onEntitiesChanged(() => _service.create(path, "folder"), reason: 'create folder');
     return ok;
   }
 }
