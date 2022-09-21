@@ -8,6 +8,7 @@ typedef JsonDecoder<T> = T Function(dynamic obj);
 
 final _jsonConverters = <Type, JsonDecoder>{
   FileEntity: (dynamic obj) => FileEntity.fromJson(obj),
+  RemoteFile: (dynamic obj) => RemoteFile.fromJson(obj),
 };
 
 class Result<T> {
@@ -76,5 +77,17 @@ class RequestBodyCreate {
   String toJson() => json.encode({
     'path': path,
     'type': type,
+  });
+}
+
+class RemoteFile {
+  final String path;
+
+  const RemoteFile(this.path);
+
+  RemoteFile.fromJson(dynamic obj): this(obj['path']);
+
+  String toJson() => json.encode({
+    'path': path,
   });
 }

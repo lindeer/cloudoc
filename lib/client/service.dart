@@ -36,4 +36,23 @@ class Service {
       throw Exception("Failed to create '$type' ${p.basename(path)}");
     }
   }
+
+  Future<RemoteFile> upload(String filepath) async {
+    final url = Uri.http(authority, 'api/upload');
+    final req = http.MultipartRequest("POST", url);
+    final part = await http.MultipartFile.fromPath(
+      "file",
+      filepath,
+      filename: p.basename(filepath),
+    );
+
+    req.files.add(part);
+    final res = await req.send();
+    if (res.statusCode == HttpStatus.ok) {
+      final body = await res.stream.bytesToString();
+      return Result.from<RemoteFile>(body).data;
+    } else {
+      throw Exception("Failed to upload '$filepath'(${res.statusCode})!}");
+    }
+  }
 }
