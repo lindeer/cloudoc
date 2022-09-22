@@ -1,6 +1,5 @@
 import 'dart:convert' show json;
 
-import 'package:shelf/shelf.dart' show Response;
 import 'file_entity.dart';
 
 typedef JsonEncoder<T> = Map<String, dynamic> Function(T obj);
@@ -15,7 +14,7 @@ class Result<T> {
   final int code;
   final T data;
 
-  Result(this.code, this.data);
+  Result(this.data, {this.code = 0});
 
   String toJson() => json.encode({
     'code': code,
@@ -34,8 +33,8 @@ class Result<T> {
     final converter = _jsonConverters[E] as JsonDecoder<E>;
     final items = list.map(converter).toList(growable: false);
     return Result<List<E>>(
-      body['code'] ?? -1,
       items,
+      code: body['code'] ?? -1,
     );
   }
 
@@ -44,20 +43,10 @@ class Result<T> {
     final converter = _jsonConverters[R] as JsonDecoder<R>;
     final R obj = converter(body['data']);
     return Result<R>(
-      body['code'] ?? -1,
       obj,
+      code: body['code'] ?? -1,
     );
   }
-
-  static Response ok<R>(R data) => make<R>(200, data);
-
-  static Response make<R>(int code, R data) => Response(
-    code,
-    body: Result(code, data).toJson(),
-    headers: {
-      'Content-type':'application/json',
-    },
-  );
 }
 
 class RequestBodyCreate {

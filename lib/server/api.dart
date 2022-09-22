@@ -11,6 +11,19 @@ import '../cloudoc.dart';
 import '../file_entity.dart';
 import '../model.dart';
 
+extension ResultExt<T> on Result<T> {
+
+  Response response(int httpCode) => Response(
+    httpCode,
+    body: toJson(),
+    headers: {
+      'Content-type':'application/json',
+    },
+  );
+
+  Response get ok => response(200);
+}
+
 const _staticDataDirectories = {
   'docs',
   'sheets',
@@ -34,7 +47,7 @@ Handler _createModelHandler(String name, String dir) {
         return Response.badRequest(body: 'Bad Request: "${req.url.path}"');
     }
     final entities = listEntities(Directory(fsPath), '$dir/static');
-    return Result.ok(entities);
+    return Result(entities).ok;
   };
 }
 
@@ -64,7 +77,7 @@ Handler serve(String root) {
     if (type == EntityType.folder) {
       Directory(p.join(fsDir, p.basename(reqBean.path))).createSync();
       final entities = listEntities(Directory(fsDir), root);
-      return Result.ok(entities);
+      return Result(entities).ok;
     }
     return Response.badRequest(body: "type '$type' is illegal!");
   });
@@ -85,7 +98,7 @@ Handler serve(String root) {
       });
     }
 
-    return msg != null ? Result.make(400, msg) : Result.ok(null);
+    return msg != null ? Result(msg, code: 1).response(400) : Result('').ok;
   });
   return router;
 }
