@@ -1,11 +1,13 @@
 
-import 'dart:convert' show HtmlEscape;
-import 'dart:io' show Directory, File, FileStat, FileSystemEntity;
+import 'dart:io' show
+                    Directory,
+                    File,
+                    FileStat,
+                    FileSystemEntity,
+                    FileSystemEntityType;
 import 'package:path/path.dart' as p;
 
 import 'file_entity.dart';
-
-const _sanitizer = HtmlEscape();
 
 List<FileEntity> listEntities(Directory dir, String refDir) {
   final items = dir.listSync(recursive: false);
@@ -61,4 +63,35 @@ EntityType _guessFileType(String filename, FileStat stat) {
       return EntityType.slide;
   }
   return EntityType.unknown;
+}
+
+class FileInfo {
+  final String name;
+  final String filename;
+  final Stream<List<int>> stream;
+
+  const FileInfo(this.name, this.filename, this.stream);
+}
+
+Future<void> writeStreamFile(
+    FileInfo file,
+    String root,
+    void Function(String reason) onError,) async {
+  final name = file.name;
+  final path = name.startsWith('/') ? name.substring(1) : name;
+  final dir = p.join(root, path);
+  if (!Directory(dir).existsSync()) {
+    onError("Directory '$name' not exists!");
+  }
+  final filename = file.filename;
+  final basename = p.basenameWithoutExtension(filename);
+  final ext = p.extension(filename);
+  String filepath = p.join(dir, filename);
+  int n = 1;
+  while (FileSystemEntity.typeSync(filepath) != FileSystemEntityType.notFound) {
+    filepath = p.join(dir, '$basename(${n++})$ext');
+  }
+  final sink = File(filepath).openWrite();
+  await sink.addStream(file.stream);
+  await sink.close();
 }

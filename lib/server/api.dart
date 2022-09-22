@@ -3,6 +3,7 @@ import 'dart:io' show Directory, FileSystemEntity, FileSystemEntityType;
 
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart' show Handler, Request, Response;
+import 'package:shelf_multipart/form_data.dart' show ReadFormData;
 import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
 
@@ -66,6 +67,25 @@ Handler serve(String root) {
       return Result.ok(entities);
     }
     return Response.badRequest(body: "type '$type' is illegal!");
+  });
+
+  router.post('/api/upload', (Request req) async {
+    if (!req.isMultipartForm) {
+      return Response(406, body: 'support only multipart form');
+    }
+    List<String>? msg;
+    await for (final form in req.multipartFormData) {
+      final file = FileInfo(
+        form.name,
+        form.filename ?? '',
+        form.part,
+      );
+      await writeStreamFile(file, root, (reason) {
+        (msg ??= <String>[]).add(reason);
+      });
+    }
+
+    return msg != null ? Result.make(400, msg) : Result.ok(null);
   });
   return router;
 }

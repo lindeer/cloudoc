@@ -49,11 +49,14 @@ class Result<T> {
     );
   }
 
-  static Response ok<R>(R data) => Response.ok(
-    Result(0, data).toJson(),
+  static Response ok<R>(R data) => make<R>(200, data);
+
+  static Response make<R>(int code, R data) => Response(
+    code,
+    body: Result(code, data).toJson(),
     headers: {
       'Content-type':'application/json',
-    }
+    },
   );
 }
 
