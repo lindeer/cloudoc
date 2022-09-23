@@ -4,10 +4,13 @@ import 'dart:io' show
                     File,
                     FileStat,
                     FileSystemEntity,
-                    FileSystemEntityType;
+                    FileSystemEntityType,
+                    Link;
 import 'package:path/path.dart' as p;
 
+import 'config.dart';
 import 'file_entity.dart';
+import 'utils.dart';
 
 List<FileEntity> listEntities(Directory dir, String refDir) {
   final items = dir.listSync(recursive: false);
@@ -73,7 +76,7 @@ class FileInfo {
   const FileInfo(this.name, this.filename, this.stream);
 }
 
-Future<void> writeStreamFile(
+Future<Link> writeStreamFile(
     FileInfo file,
     String root,
     void Function(String reason) onError,) async {
@@ -86,12 +89,22 @@ Future<void> writeStreamFile(
   final filename = file.filename;
   final basename = p.basenameWithoutExtension(filename);
   final ext = p.extension(filename);
+
+  // write file into static folder
+  final extKey = ext.replaceAll('.', '');
+  final folder = fileDirectories[extKey] ?? defaultFileDirectory;
+  final fileId = genShortId();
+  final target = p.join(root, 'static', folder, '$fileId$ext');
+  final sink = File(target).openWrite();
+  await sink.addStream(file.stream);
+  await sink.close();
+
   String filepath = p.join(dir, filename);
   int n = 1;
   while (FileSystemEntity.typeSync(filepath) != FileSystemEntityType.notFound) {
     filepath = p.join(dir, '$basename(${n++})$ext');
   }
-  final sink = File(filepath).openWrite();
-  await sink.addStream(file.stream);
-  await sink.close();
+  final link = await Link(filepath).create(p.relative(target, from: dir));
+  print('writeStreamFile: Create link ${link.path} -> $target');
+  return link;
 }
