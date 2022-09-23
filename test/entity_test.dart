@@ -8,7 +8,7 @@ void main() {
   test('list entities', () {
     final l1 = listEntities(Directory('test/_test_/data'), 'test/_test_/static');
 
-    expect(l1.length, 3);
+    expect(l1.length, 2);
     expect(l1.first.type, EntityType.folder);
     expect(l1.last.type, EntityType.doc);
 
