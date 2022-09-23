@@ -87,18 +87,21 @@ Handler serve(String root) {
       return Response(406, body: 'support only multipart form');
     }
     List<String>? msg;
+    final files = <RemoteFile>[];
     await for (final form in req.multipartFormData) {
       final file = FileInfo(
         form.name,
         form.filename ?? '',
         form.part,
       );
-      await writeStreamFile(file, root, (reason) {
+      final link = await writeStreamFile(file, root, (reason) {
         (msg ??= <String>[]).add(reason);
       });
+      final filename = p.basename(link.path);
+      files.add(RemoteFile(p.join(form.name, filename)));
     }
 
-    return msg != null ? Result(msg, code: 1).response(400) : Result('').ok;
+    return msg != null ? Result(msg, code: 1).response(400) : Result(files).ok;
   });
   return router;
 }

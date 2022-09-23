@@ -79,7 +79,7 @@ class RemoteFile {
 
   RemoteFile.fromJson(dynamic obj): this(obj['path']);
 
-  String toJson() => json.encode({
+  Map<String, dynamic> toJson() => {
     'path': path,
-  });
+  };
 }

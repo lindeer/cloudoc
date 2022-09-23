@@ -37,11 +37,11 @@ class Service {
     }
   }
 
-  Future<RemoteFile> upload(String filepath) async {
+  Future<RemoteFile> upload(String filepath, String remote) async {
     final url = Uri.http(authority, 'api/upload');
     final req = http.MultipartRequest("POST", url);
     final part = await http.MultipartFile.fromPath(
-      "file",
+      remote,
       filepath,
       filename: p.basename(filepath),
     );
@@ -50,7 +50,8 @@ class Service {
     final res = await req.send();
     if (res.statusCode == HttpStatus.ok) {
       final body = await res.stream.bytesToString();
-      return Result.from<RemoteFile>(body).data;
+      final files = Result.listFrom<RemoteFile>(body).data;
+      return files.first;
     } else {
       throw Exception("Failed to upload '$filepath'(${res.statusCode})!}");
     }
