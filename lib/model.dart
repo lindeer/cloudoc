@@ -42,3 +42,11 @@ class RemoteFile {
     'path': path,
   };
 }
+
+class LocalFile {
+  final String filename;
+  final int size;
+  final Stream<List<int>> stream;
+
+  const LocalFile(this.filename, this.size, this.stream);
+}

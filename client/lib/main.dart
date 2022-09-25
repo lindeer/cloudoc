@@ -1,4 +1,5 @@
 import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/model.dart' show LocalFile;
 import 'package:file_picker/file_picker.dart' show FilePicker;
 import 'package:flutter/material.dart';
 
@@ -119,8 +120,11 @@ class _BrowserPageState extends State<_BrowserPage> {
       withData: false,
       withReadStream: true,
     );
-    final files = result?.files.map((file) {
-    });
+    if (result != null) {
+      await _model.uploadFile(result.files.map((f) {
+        return LocalFile(f.name, f.size, f.readStream!);
+      }).toList(growable: false));
+    }
   }
 
   static const _fileIcons = {

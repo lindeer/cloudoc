@@ -1,5 +1,6 @@
 
 import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/model.dart' show LocalFile;
 import 'package:flutter/widgets.dart' show ValueNotifier;
 
 import 'service.dart';
@@ -92,6 +93,23 @@ class FileBrowserModel {
   Future<bool> createFolder(String name) async {
     final path = [..._pathStack, name].join('/');
     final ok = await _onEntitiesChanged(() => _service.create(path, "folder"), reason: 'create folder');
+    return ok;
+  }
+
+  Future<bool> uploadFile(List<LocalFile> files) async {
+    final remoteDir = _pathStack.join('/');
+    bool ok = true;
+    loadingNotifier.value = LoadingState.loading;
+    try {
+      await _service.upload(files, remoteDir);
+      final path = _pathStack.join('/');
+      _onEntitiesChanged(() => _service.listEntities(path), reason: 'upload files');
+
+    } on Exception catch (e) {
+      _errorMsg = e.toString();
+      loadingNotifier.value = LoadingState.error;
+      ok = false;
+    }
     return ok;
   }
 }

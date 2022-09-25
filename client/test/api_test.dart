@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloudoc/model.dart';
 import 'package:cloudoc_client/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc_server/api.dart' as api;
@@ -61,8 +62,9 @@ void main() async {
     deletingFiles.add('test/_test_$serverPath');
     deletingFiles.add('test/_test_$serverPath2');
 
+    final f1 = File(localFile);
     final file = await service.upload(
-      localFile,
+      [LocalFile(filename, f1.statSync().size, f1.openRead())],
       serverDir,
     );
     expect(file.path, serverPath);
@@ -74,7 +76,7 @@ void main() async {
     expect(p.dirname(target).endsWith('static/sheets'), true);
 
     final file2 = await service.upload(
-      localFile,
+      [LocalFile(filename, f1.statSync().size, f1.openRead())],
       serverDir,
     );
     expect(file2.path, serverPath2);
