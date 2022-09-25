@@ -10,3 +10,4 @@ pubspec.lock
 *.iml
 .flutter-plugins
 .flutter-plugins-dependencies
+_data
