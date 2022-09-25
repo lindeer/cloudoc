@@ -11,6 +11,8 @@ import 'package:shelf_multipart/form_data.dart' show ReadFormData;
 import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
 
+import 'file_id.dart';
+
 extension ResultExt<T> on Result<T> {
 
   Response response(int httpCode) => Response(
@@ -97,6 +99,7 @@ Handler serve(String root) {
     final files = <RemoteFile>[];
     await for (final form in req.multipartFormData) {
       final file = FileInfo(
+        fileId(),
         form.name,
         form.filename ?? '',
         form.part,

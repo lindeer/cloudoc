@@ -10,7 +10,6 @@ import 'package:path/path.dart' as p;
 
 import 'config.dart';
 import 'file_entity.dart';
-import 'utils.dart';
 
 List<FileEntity> listEntities(Directory dir, String refDir) {
   final items = dir.listSync(recursive: false);
@@ -69,11 +68,12 @@ EntityType _guessFileType(String filename, FileStat stat) {
 }
 
 class FileInfo {
+  final String fileId;
   final String name;
   final String filename;
   final Stream<List<int>> stream;
 
-  const FileInfo(this.name, this.filename, this.stream);
+  const FileInfo(this.fileId, this.name, this.filename, this.stream);
 }
 
 Future<Link> writeStreamFile(
@@ -93,7 +93,7 @@ Future<Link> writeStreamFile(
   // write file into static folder
   final extKey = ext.replaceAll('.', '');
   final folder = fileDirectories[extKey] ?? defaultFileDirectory;
-  final fileId = genShortId();
+  final fileId = file.fileId;
   final target = p.join(root, 'static', folder, '$fileId$ext');
   final sink = File(target).openWrite();
   await sink.addStream(file.stream);
