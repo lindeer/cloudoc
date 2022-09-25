@@ -1,8 +1,8 @@
 import 'dart:io';
 
-import 'package:cloudoc/client/service.dart';
+import 'package:cloudoc_client/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
-import 'package:cloudoc/server/api.dart' as api;
+import 'package:cloudoc_server/api.dart' as api;
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
