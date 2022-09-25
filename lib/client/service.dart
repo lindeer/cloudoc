@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 
 import '../file_entity.dart';
 import '../model.dart';
+import '../convert.dart' as c;
 
 class Service {
   final String authority;
@@ -14,7 +15,7 @@ class Service {
   Future<List<FileEntity>> listEntities(String path) async {
     final res = await http.get(Uri.http(authority, 'api/$path'));
     if (res.statusCode == HttpStatus.ok) {
-      final result = Result.listFrom<FileEntity>(res.body);
+      final result = c.listBodyFrom<FileEntity>(res.body);
       return result.data;
     } else {
       throw Exception("Failed to fetch entities from '$path'");
@@ -27,13 +28,13 @@ class Service {
       headers: const {
         "Content-Type": "application/json",
       },
-      body: RequestBodyCreate(path: path, type: type).toJson(),
+      body: c.serialize(RequestBodyCreate(path: path, type: type)),
     );
     if (res.statusCode == HttpStatus.ok) {
-      final result = Result.listFrom<FileEntity>(res.body);
+      final result = c.listBodyFrom<FileEntity>(res.body);
       return result.data;
     } else {
-      throw Exception("Failed to create '$type' ${p.basename(path)}");
+      throw Exception("${res.statusCode}: Failed to create '$type' ${p.basename(path)}");
     }
   }
 
@@ -50,7 +51,7 @@ class Service {
     final res = await req.send();
     if (res.statusCode == HttpStatus.ok) {
       final body = await res.stream.bytesToString();
-      final files = Result.listFrom<RemoteFile>(body).data;
+      final files = c.listBodyFrom<RemoteFile>(body).data;
       return files.first;
     } else {
       throw Exception("Failed to upload '$filepath'(${res.statusCode})!}");

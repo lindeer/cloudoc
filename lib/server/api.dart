@@ -10,12 +10,13 @@ import 'package:shelf_static/shelf_static.dart';
 import '../cloudoc.dart';
 import '../file_entity.dart';
 import '../model.dart';
+import '../convert.dart' as c;
 
 extension ResultExt<T> on Result<T> {
 
   Response response(int httpCode) => Response(
     httpCode,
-    body: toJson(),
+    body: c.serialize(this),
     headers: {
       'Content-type':'application/json',
     },
@@ -64,7 +65,7 @@ Handler serve(String root) {
   router.get('/api/desktop<path|.*>', _createModelHandler('desktop', root));
 
   router.post('/api/create', (Request req) async {
-    final reqBean = RequestBodyCreate.fromJson(await req.readAsString());
+    final reqBean = c.deserialize<RequestBodyCreate>(await req.readAsString());
     String parent = p.dirname(reqBean.path);
     if (parent.startsWith('/')) {
       parent = parent.substring(1);

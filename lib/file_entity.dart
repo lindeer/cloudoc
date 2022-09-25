@@ -22,7 +22,7 @@ class FileEntity {
     this.path,
   });
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> get json => {
     'name': name,
     'updated': lastUpdated,
     'size': size,
