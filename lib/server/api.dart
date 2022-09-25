@@ -34,6 +34,9 @@ const _staticDataDirectories = {
 
 Handler _createModelHandler(String name, String dir) {
   final rootDir = Directory(p.join(dir, name));
+  if (!rootDir.existsSync()) {
+    rootDir.createSync(recursive: true);
+  }
   final root = rootDir.resolveSymbolicLinksSync();
 
   return (Request req) {
@@ -55,7 +58,11 @@ Handler _createModelHandler(String name, String dir) {
 Handler serve(String root) {
   final router = Router();
   for (final name in _staticDataDirectories) {
-    final handler = createStaticHandler('$root/static/$name');
+    final dir = '$root/static/$name';
+    if (!FileSystemEntity.isDirectorySync(dir)) {
+      Directory(dir).createSync(recursive: true);
+    }
+    final handler = createStaticHandler(dir);
     router.get('/$name/<path|.*>', (Request req, String path) {
       final r = req.change(path: name);
       return handler(r);
