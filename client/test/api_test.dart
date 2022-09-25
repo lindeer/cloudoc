@@ -64,7 +64,7 @@ void main() async {
 
     final f1 = File(localFile);
     final file = await service.upload(
-      [LocalFile(filename, f1.statSync().size, f1.openRead())],
+      [LocalFile(filename: filename, size: f1.statSync().size, stream: f1.openRead())],
       serverDir,
     );
     expect(file.path, serverPath);
@@ -76,7 +76,7 @@ void main() async {
     expect(p.dirname(target).endsWith('static/sheets'), true);
 
     final file2 = await service.upload(
-      [LocalFile(filename, f1.statSync().size, f1.openRead())],
+      [LocalFile(filename: filename, size: f1.statSync().size, stream: f1.openRead())],
       serverDir,
     );
     expect(file2.path, serverPath2);

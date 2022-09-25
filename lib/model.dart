@@ -43,10 +43,25 @@ class RemoteFile {
   };
 }
 
+/// In client side, it is actual local file.
+/// In server side, it is the representation of multi part file.
 class LocalFile {
   final String filename;
+  /// not necessary for server side, just set 0.
   final int size;
   final Stream<List<int>> stream;
+  /// necessary for server side, it is the multiPart's name.
+  final String? path;
+  /// necessary for server side.
+  final String? fid;
 
-  const LocalFile(this.filename, this.size, this.stream);
+  const LocalFile({
+    required this.filename,
+    required this.size,
+    required this.stream,
+    this.path,
+    this.fid,
+  });
+
+  String get fileId => fid ?? ('0' * 22);
 }

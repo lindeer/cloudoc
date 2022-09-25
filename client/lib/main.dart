@@ -122,7 +122,11 @@ class _BrowserPageState extends State<_BrowserPage> {
     );
     if (result != null) {
       await _model.uploadFile(result.files.map((f) {
-        return LocalFile(f.name, f.size, f.readStream!);
+        return LocalFile(
+          filename: f.name,
+          size: f.size,
+          stream: f.readStream!,
+        );
       }).toList(growable: false));
     }
   }

@@ -10,6 +10,7 @@ import 'package:path/path.dart' as p;
 
 import 'config.dart';
 import 'file_entity.dart';
+import 'model.dart';
 
 List<FileEntity> listEntities(Directory dir, String refDir) {
   final items = dir.listSync(recursive: false);
@@ -67,20 +68,11 @@ EntityType _guessFileType(String filename, FileStat stat) {
   return EntityType.unknown;
 }
 
-class FileInfo {
-  final String fileId;
-  final String name;
-  final String filename;
-  final Stream<List<int>> stream;
-
-  const FileInfo(this.fileId, this.name, this.filename, this.stream);
-}
-
 Future<Link> writeStreamFile(
-    FileInfo file,
+    LocalFile file,
     String root,
     void Function(String reason) onError,) async {
-  final name = file.name;
+  final name = file.path ?? '';
   final path = name.startsWith('/') ? name.substring(1) : name;
   final dir = p.join(root, path);
   if (!Directory(dir).existsSync()) {

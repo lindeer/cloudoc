@@ -98,11 +98,12 @@ Handler serve(String root) {
     List<String>? msg;
     final files = <RemoteFile>[];
     await for (final form in req.multipartFormData) {
-      final file = FileInfo(
-        fileId(),
-        form.name,
-        form.filename ?? '',
-        form.part,
+      final file = LocalFile(
+        filename: form.filename ?? '',
+        size: 0,
+        stream: form.part,
+        path: form.name,
+        fid: fileId(),
       );
       final link = await writeStreamFile(file, root, (reason) {
         (msg ??= <String>[]).add(reason);
