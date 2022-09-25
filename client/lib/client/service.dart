@@ -1,11 +1,10 @@
 import 'dart:io' show HttpStatus;
 
-import 'package:path/path.dart' as p;
+import 'package:cloudoc/convert.dart' as c;
+import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/model.dart';
 import 'package:http/http.dart' as http;
-
-import '../file_entity.dart';
-import '../model.dart';
-import '../convert.dart' as c;
+import 'package:path/path.dart' as p;
 
 class Service {
   final String authority;

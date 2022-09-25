@@ -1,5 +1,5 @@
 
-import 'package:cloudoc/server/api.dart' as api;
+import 'package:cloudoc_server/api.dart' as api;
 import 'package:shelf/shelf.dart' show Pipeline, logRequests;
 import 'package:shelf/shelf_io.dart' as io;
 import 'package:shelf_cors_headers/shelf_cors_headers.dart';

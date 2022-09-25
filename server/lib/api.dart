@@ -1,16 +1,15 @@
 
 import 'dart:io' show Directory, FileSystemEntity, FileSystemEntityType;
 
+import 'package:cloudoc/cloudoc.dart';
+import 'package:cloudoc/convert.dart' as c;
+import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/model.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart' show Handler, Request, Response;
 import 'package:shelf_multipart/form_data.dart' show ReadFormData;
 import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
-
-import '../cloudoc.dart';
-import '../file_entity.dart';
-import '../model.dart';
-import '../convert.dart' as c;
 
 extension ResultExt<T> on Result<T> {
 

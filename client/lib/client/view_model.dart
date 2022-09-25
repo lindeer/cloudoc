@@ -1,7 +1,7 @@
 
+import 'package:cloudoc/file_entity.dart';
 import 'package:flutter/widgets.dart' show ValueNotifier;
 
-import '../file_entity.dart';
 import 'service.dart';
 
 enum LoadingState {

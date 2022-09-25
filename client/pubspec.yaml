@@ -1,0 +1,28 @@
+name: cloudoc_client
+description: A sample command-line application.
+version: 1.0.0
+# homepage: https://www.example.com
+
+environment:
+  sdk: '>=2.12.0 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  path: 1.8.2
+  http: 0.13.5
+  file_picker: 5.1.0
+  cloudoc:
+    path: ..
+
+dev_dependencies:
+  lints: ^2.0.0
+  test: ^1.16.0
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  fonts:
+    - family:  FontAwesome4
+      fonts:
+        - asset: fonts/FontAwesome4.ttf

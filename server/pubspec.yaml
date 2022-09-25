@@ -1,4 +1,4 @@
-name: cloudoc
+name: cloudoc_server
 description: A sample command-line application.
 version: 1.0.0
 # homepage: https://www.example.com
@@ -7,6 +7,14 @@ environment:
   sdk: '>=2.12.0 <3.0.0'
 
 dependencies:
+  path: 1.8.2
+  shelf_static: 1.1.1
+  shelf: 1.3.2
+  shelf_router: 1.1.3
+  shelf_cors_headers: 0.1.3
+  shelf_multipart: 1.0.0
+  cloudoc:
+    path: ..
 
 dev_dependencies:
   lints: ^2.0.0

@@ -1,10 +1,11 @@
-import 'package:cloudoc/client/expand_fab.dart';
-import 'package:cloudoc/client/service.dart';
-import 'package:cloudoc/client/view_model.dart';
 import 'package:cloudoc/file_entity.dart';
-import 'package:cloudoc/client/font_awesome4_icons.dart';
 import 'package:file_picker/file_picker.dart' show FilePicker;
 import 'package:flutter/material.dart';
+
+import 'client/expand_fab.dart';
+import 'client/font_awesome4_icons.dart';
+import 'client/service.dart';
+import 'client/view_model.dart';
 
 void main() {
   runApp(const _FileExplorer());
