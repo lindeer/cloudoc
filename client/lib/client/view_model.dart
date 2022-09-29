@@ -97,14 +97,28 @@ class FileBrowserModel {
   }
 
   Future<bool> uploadFile(List<LocalFile> files) async {
-    final remoteDir = _pathStack.join('/');
+    final remoteDir = path;
     bool ok = true;
     loadingNotifier.value = LoadingState.loading;
     try {
       await _service.upload(files, remoteDir);
-      final path = _pathStack.join('/');
-      _onEntitiesChanged(() => _service.listEntities(path), reason: 'upload files');
+      _onEntitiesChanged(() => _service.listEntities(remoteDir), reason: 'upload files');
+    } on Exception catch (e) {
+      _errorMsg = e.toString();
+      loadingNotifier.value = LoadingState.error;
+      ok = false;
+    }
+    return ok;
+  }
 
+  Future<bool> deleteEntity(FileEntity entity) async {
+    final remoteDir = path;
+    bool ok = true;
+    loadingNotifier.value = LoadingState.loading;
+    try {
+      _onEntitiesChanged(() => _service.delete('$remoteDir/${entity.name}'),
+        reason: "delete entity '${entity.name}'",
+      );
     } on Exception catch (e) {
       _errorMsg = e.toString();
       loadingNotifier.value = LoadingState.error;

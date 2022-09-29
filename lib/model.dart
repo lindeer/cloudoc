@@ -33,13 +33,16 @@ class RequestBodyCreate {
 
 class RemoteFile {
   final String path;
+  final String? ref;
 
-  const RemoteFile(this.path);
+  const RemoteFile(this.path, [this.ref]);
 
-  RemoteFile.fromJson(dynamic obj): this(obj['path']);
+  RemoteFile.fromJson(dynamic obj): this(obj['path'], obj['ref']);
 
   Map<String, dynamic> get json => {
     'path': path,
+    if (ref != null)
+      'ref': ref,
   };
 }
 

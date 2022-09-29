@@ -146,6 +146,10 @@ class _BrowserPageState extends State<_BrowserPage> {
       child: ListTile(
         leading: Icon(icon, color: Colors.orange,),
         title: Text('${entity.name}$suffix'),
+        trailing: IconButton(
+          icon: Icon(Icons.delete_outlined, color: Colors.black38,),
+          onPressed: () => _model.deleteEntity(entity),
+        ),
         onTap: entity.type != EntityType.unknown
             ? () => _model.onEntityClicked(entity)
             : null,

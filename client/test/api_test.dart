@@ -82,6 +82,31 @@ void main() async {
     expect(file2.path, serverPath2);
   });
 
+  test('test delete directory', () async {
+    const name = 'deleting-folder';
+    final list1 = await service.create('/desktop/path/$name', 'folder');
+    final created = list1.firstWhere((e) => e.name == name);
+    expect(created.type, EntityType.folder);
+    final list2 = await service.delete('/desktop/path/$name');
+    final names = list2.map((e) => e.name);
+    expect(names.contains(name), false);
+  });
+
+  test('test delete file', () async {
+    const filename = '用于测试.xlsx';
+    const serverDir = '/desktop/path';
+    final f = File('test/_test_/test_upload.xlsx');
+    final file = await service.upload(
+      [LocalFile(filename: filename, size: f.statSync().size, stream: f.openRead())],
+      serverDir,
+    );
+    final entities = await service.delete(file.path);
+    final names = entities.map((e) => e.name);
+    expect(names.contains(filename), false);
+    final ref = file.ref!;
+    File('test/_test_/$ref').deleteSync();
+  });
+
   tearDownAll(() {
     server.close(force: true);
     for (final path in deletingFiles) {

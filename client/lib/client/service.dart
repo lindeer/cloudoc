@@ -56,4 +56,18 @@ class Service {
           .whereType<String>()}'(${res.statusCode})!}");
     }
   }
+
+  Future<List<FileEntity>> delete(String path, {bool? resolveLink}) async {
+    if (path.startsWith("/")) {
+      path = path.substring(1);
+    }
+    final url = Uri.http(authority, p.join('api/delete', path));
+    final res = await http.delete(url);
+    if (res.statusCode == HttpStatus.ok) {
+      final result = c.listBodyFrom<FileEntity>(res.body);
+      return result.data;
+    } else {
+      throw Exception("(${res.statusCode}): Failed to delete path '$path'");
+    }
+  }
 }

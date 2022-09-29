@@ -1,5 +1,5 @@
 
-import 'dart:io' show Directory, FileSystemEntity, FileSystemEntityType;
+import 'dart:io' show Directory, File, FileSystemEntity, FileSystemEntityType;
 
 import 'package:cloudoc/cloudoc.dart';
 import 'package:cloudoc/convert.dart' as c;
@@ -108,11 +108,35 @@ Handler serve(String root) {
       final link = await writeStreamFile(file, root, (reason) {
         (msg ??= <String>[]).add(reason);
       });
+      final actual = link.resolveSymbolicLinksSync();
       final filename = p.basename(link.path);
-      files.add(RemoteFile(p.join(form.name, filename)));
+      files.add(RemoteFile(p.join(form.name, filename), p.relative(actual, from: root)));
     }
 
     return msg != null ? Result(msg, code: 1).response(400) : Result(files).ok;
+  });
+
+  router.delete('/api/delete<path|.*>', (Request req, String path) {
+    if (path.startsWith('/')) {
+      path = path.substring(1);
+    }
+    final fsPath = p.join(root, Uri.decodeComponent(path));
+    final type = FileSystemEntity.typeSync(fsPath, followLinks: false);
+    if (type == FileSystemEntityType.notFound) {
+      return Response.notFound("path '$path' not found!");
+    }
+    Directory parent;
+    if (type == FileSystemEntityType.directory) {
+      final d = Directory(fsPath);
+      parent = d.parent;
+      d.deleteSync(recursive: true);
+    } else {
+      final f = File(fsPath);
+      parent = f.parent;
+      f.deleteSync(recursive: true);
+    }
+    final entities = listEntities(parent, root);
+    return Result(entities).ok;
   });
   return router;
 }
