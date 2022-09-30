@@ -4,7 +4,9 @@ import 'dart:io' show Directory, File, FileSystemEntity, FileSystemEntityType;
 import 'package:cloudoc/cloudoc.dart';
 import 'package:cloudoc/convert.dart' as c;
 import 'package:cloudoc/file_entity.dart';
+import 'package:cloudoc/meta.dart';
 import 'package:cloudoc/model.dart';
+import 'package:cloudoc/user.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart' show Handler, Request, Response;
 import 'package:shelf_multipart/form_data.dart' show ReadFormData;
@@ -24,6 +26,18 @@ extension ResultExt<T> on Result<T> {
   );
 
   Response get ok => response(200);
+}
+
+final _self = User(
+  id: 'uid-0',
+  name: 'Wesley Chang',
+  email: 'le.chang118@gmail.com',
+);
+
+extension _RequestExt on Request {
+  User get user {
+    return _self;
+  }
 }
 
 const _staticDataDirectories = {
@@ -96,7 +110,9 @@ Handler serve(String root) {
       return Response(406, body: 'support only multipart form');
     }
     List<String>? msg;
+    final meta = Meta(root);
     final files = <RemoteFile>[];
+    final user = req.user;
     await for (final form in req.multipartFormData) {
       final file = LocalFile(
         filename: form.filename ?? '',
@@ -111,6 +127,7 @@ Handler serve(String root) {
       final actual = link.resolveSymbolicLinksSync();
       final filename = p.basename(link.path);
       files.add(RemoteFile(p.join(form.name, filename), p.relative(actual, from: root)));
+      meta.create(file.fileId, user);
     }
 
     return msg != null ? Result(msg, code: 1).response(400) : Result(files).ok;

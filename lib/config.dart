@@ -11,3 +11,5 @@ final staticDocDirectories = [
   ...fileDirectories.values,
   defaultFileDirectory,
 ];
+
+const historyDir = 'history';
