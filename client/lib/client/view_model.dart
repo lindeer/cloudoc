@@ -80,16 +80,6 @@ class FileBrowserModel {
     return ok;
   }
 
-  void onEntityClicked(FileEntity entity) {
-    switch (entity.type) {
-      case EntityType.folder:
-        enter(entity.name);
-        break;
-      default:
-        break;
-    }
-  }
-
   Future<bool> createFolder(String name) async {
     final path = [..._pathStack, name].join('/');
     final ok = await _onEntitiesChanged(() => _service.create(path, "folder"), reason: 'create folder');

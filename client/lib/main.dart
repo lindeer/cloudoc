@@ -2,6 +2,8 @@ import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc/model.dart' show LocalFile;
 import 'package:file_picker/file_picker.dart' show FilePicker;
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
+import 'package:url_launcher/url_launcher.dart' show launchUrl;
 
 import 'client/expand_fab.dart';
 import 'client/font_awesome4_icons.dart';
@@ -81,6 +83,20 @@ class _BrowserPageState extends State<_BrowserPage> {
     }
   }
 
+  void onEntityClicked(FileEntity entity) {
+    switch (entity.type) {
+      case EntityType.folder:
+        _model.enter(entity.name);
+        break;
+      default:
+        final file = p.join(_model.path, entity.name);
+        launchUrl(
+          Uri.parse('http://0.0.0.0:8989/edit?file=$file'),
+        );
+        break;
+    }
+  }
+
   void _createFolder(BuildContext context) async {
     final controller = TextEditingController();
     final folderName = await showDialog<String>(
@@ -151,7 +167,7 @@ class _BrowserPageState extends State<_BrowserPage> {
           onPressed: () => _model.deleteEntity(entity),
         ),
         onTap: entity.type != EntityType.unknown
-            ? () => _model.onEntityClicked(entity)
+            ? () => onEntityClicked(entity)
             : null,
       ),
     );

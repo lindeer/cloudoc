@@ -155,5 +155,18 @@ Handler serve(String root) {
     final entities = listEntities(parent, root);
     return Result(entities).ok;
   });
+
+  router.get('/edit', (Request req) {
+    final params = req.requestedUri.queryParameters;
+    String file = params['file'] ?? '';
+    final fsPath = p.join(root, file);
+    final type = FileSystemEntity.typeSync(fsPath, followLinks: true);
+    if (type == FileSystemEntityType.notFound) {
+      return Response.notFound("file '$file' not found!");
+    }
+    return Response.ok('<h1>Hello onlyOffice!</h1>', headers: {
+      'content-type': 'text/html; charset=utf-8',
+    });
+  });
   return router;
 }
