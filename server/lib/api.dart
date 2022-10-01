@@ -10,10 +10,10 @@ import 'package:cloudoc/user.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart' show Handler, Request, Response;
 import 'package:shelf_multipart/form_data.dart' show ReadFormData;
-import 'package:shelf_router/shelf_router.dart' show Router;
 import 'package:shelf_static/shelf_static.dart';
 
 import 'file_id.dart';
+import 'src/serve_context.dart';
 
 extension ResultExt<T> on Result<T> {
 
@@ -70,8 +70,9 @@ Handler _createModelHandler(String name, String dir) {
   };
 }
 
-Handler serve(String root) {
-  final router = Router();
+Handler serve(ServeContext context) {
+  final root = context.root;
+  final router = context.router;
   for (final name in _staticDataDirectories) {
     final dir = '$root/static/$name';
     if (!FileSystemEntity.isDirectorySync(dir)) {
@@ -154,19 +155,6 @@ Handler serve(String root) {
     }
     final entities = listEntities(parent, root);
     return Result(entities).ok;
-  });
-
-  router.get('/edit', (Request req) {
-    final params = req.requestedUri.queryParameters;
-    String file = params['file'] ?? '';
-    final fsPath = p.join(root, file);
-    final type = FileSystemEntity.typeSync(fsPath, followLinks: true);
-    if (type == FileSystemEntityType.notFound) {
-      return Response.notFound("file '$file' not found!");
-    }
-    return Response.ok('<h1>Hello onlyOffice!</h1>', headers: {
-      'content-type': 'text/html; charset=utf-8',
-    });
   });
   return router;
 }

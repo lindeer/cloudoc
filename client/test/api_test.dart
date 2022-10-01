@@ -4,6 +4,7 @@ import 'package:cloudoc/model.dart';
 import 'package:cloudoc_client/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc_server/api.dart' as api;
+import 'package:cloudoc_server/src/serve_context.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart';
 import 'package:shelf/shelf_io.dart' as io;
@@ -12,7 +13,7 @@ import 'package:test/test.dart';
 void main() async {
   final handler = const Pipeline()
       .addMiddleware(logRequests())
-      .addHandler(api.serve('test/_test_'));
+      .addHandler(api.serve(ServeContext(root: 'test/_test_')));
   const port = 8964;
   final server = await io.serve(handler, '0.0.0.0', port);
   final service = Service('0.0.0.0:$port');
