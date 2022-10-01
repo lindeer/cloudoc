@@ -63,10 +63,11 @@ void main() async {
     deletingFiles.add('test/_test_$serverPath2');
 
     final f1 = File(localFile);
-    final file = await service.upload(
+    List<RemoteFile> items = await service.upload(
       [LocalFile(filename: filename, size: f1.statSync().size, stream: f1.openRead())],
       serverDir,
     );
+    final file = items.first;
     expect(file.path, serverPath);
     expect(FileSystemEntity.isLinkSync('test/_test_/$serverPath'), true);
     final link = File('test/_test_/$serverPath');
@@ -75,10 +76,11 @@ void main() async {
     expect(File(target).statSync().size, local.statSync().size);
     expect(p.dirname(target).endsWith('static/sheets'), true);
 
-    final file2 = await service.upload(
+    items = await service.upload(
       [LocalFile(filename: filename, size: f1.statSync().size, stream: f1.openRead())],
       serverDir,
     );
+    final file2 = items.first;
     expect(file2.path, serverPath2);
   });
 
@@ -96,10 +98,11 @@ void main() async {
     const filename = '用于测试.xlsx';
     const serverDir = '/desktop/path';
     final f = File('test/_test_/test_upload.xlsx');
-    final file = await service.upload(
+    final items = await service.upload(
       [LocalFile(filename: filename, size: f.statSync().size, stream: f.openRead())],
       serverDir,
     );
+    final file = items.first;
     final entities = await service.delete(file.path);
     final names = entities.map((e) => e.name);
     expect(names.contains(filename), false);
