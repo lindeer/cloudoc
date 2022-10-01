@@ -11,14 +11,23 @@ class Service {
 
   Service(this.authority);
 
-  Future<List<FileEntity>> listEntities(String path) async {
-    final res = await http.get(Uri.http(authority, 'api/$path'));
-    if (res.statusCode == HttpStatus.ok) {
-      final result = c.listBodyFrom<FileEntity>(res.body);
+  static List<T> _bodyToItems<T>(http.BaseResponse res, String body, String errMsg) {
+    final status = res.statusCode;
+    if (status == HttpStatus.ok) {
+      final Result<List<T>> result = c.listBodyFrom<T>(body);
       return result.data;
     } else {
-      throw Exception("Failed to fetch entities from '$path'");
+      throw Exception('($status): $errMsg');
     }
+  }
+
+  Future<List<FileEntity>> listEntities(String path) async {
+    final res = await http.get(Uri.http(authority, 'api/$path'));
+    return _bodyToItems<FileEntity>(
+      res,
+      res.body,
+      "Failed to fetch entities from '$path'",
+    );
   }
 
   Future<List<FileEntity>> create(String path, String type) async {
@@ -29,12 +38,11 @@ class Service {
       },
       body: c.serialize(RequestBodyCreate(path: path, type: type)),
     );
-    if (res.statusCode == HttpStatus.ok) {
-      final result = c.listBodyFrom<FileEntity>(res.body);
-      return result.data;
-    } else {
-      throw Exception("${res.statusCode}: Failed to create '$type' ${p.basename(path)}");
-    }
+    return _bodyToItems<FileEntity>(
+      res,
+      res.body,
+      "Failed to create '$type' ${p.basename(path)}",
+    );
   }
 
   Future<List<RemoteFile>> upload(List<LocalFile> files, String remote) async {
@@ -47,14 +55,12 @@ class Service {
       filename: f.filename,
     )));
     final res = await req.send();
-    if (res.statusCode == HttpStatus.ok) {
-      final body = await res.stream.bytesToString();
-      final files = c.listBodyFrom<RemoteFile>(body).data;
-      return files;
-    } else {
-      throw Exception("Failed to upload '${files.map((e) => e.filename)
-          .whereType<String>()}'(${res.statusCode})!}");
-    }
+    final list = _bodyToItems<RemoteFile>(
+      res,
+      await res.stream.bytesToString(),
+      "Failed to upload '${files.map((e) => e.filename).whereType<String>()}'!}",
+    );
+    return list;
   }
 
   Future<List<FileEntity>> delete(String path, {bool? resolveLink}) async {
@@ -63,11 +69,10 @@ class Service {
     }
     final url = Uri.http(authority, p.join('api/delete', path));
     final res = await http.delete(url);
-    if (res.statusCode == HttpStatus.ok) {
-      final result = c.listBodyFrom<FileEntity>(res.body);
-      return result.data;
-    } else {
-      throw Exception("(${res.statusCode}): Failed to delete path '$path'");
-    }
+    return _bodyToItems(
+      res,
+      res.body,
+      "Failed to delete path '$path'",
+    );
   }
 }
