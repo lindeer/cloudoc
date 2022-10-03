@@ -28,6 +28,7 @@ void main(List<String> args) {
 
   final context = ServeContext(
     root: dir ?? _dataRoot,
+    docServer: 'http://192.168.0.130',
   );
 
   api.serve(context);

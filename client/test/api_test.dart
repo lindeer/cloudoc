@@ -13,7 +13,7 @@ import 'package:test/test.dart';
 void main() async {
   final handler = const Pipeline()
       .addMiddleware(logRequests())
-      .addHandler(api.serve(ServeContext(root: 'test/_test_')));
+      .addHandler(api.serve(ServeContext(root: 'test/_test_', docServer: '0.0.0.0')));
   const port = 8964;
   final server = await io.serve(handler, '0.0.0.0', port);
   final service = Service('0.0.0.0:$port');
