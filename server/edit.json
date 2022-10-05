@@ -1,0 +1,101 @@
+{
+  "cfg": {
+    "type": "desktop",
+    "documentType": "word",
+    "document": {
+      "title": "彼时意大利v1.docx",
+      "url": "http://0.0.0.0:8989/static/docs/o2RnXsMA1HowxEx1zyokLw.docx",
+      "fileType": "docx",
+      "key": "1015157997",
+      "info": {
+        "owner": "Me",
+        "uploaded": "2022-10-04 18:03:00",
+        "favorite": true
+      },
+      "permissions": {
+        "comment": true,
+        "copy": true,
+        "download": true,
+        "edit": true,
+        "print": true,
+        "fillForms": true,
+        "modifyFilter": true,
+        "modifyContentControl": true,
+        "review": true,
+        "reviewGroups": [
+          "group-2",
+          ""
+        ],
+        "commentGroups": {
+          "view": "",
+          "edit": [
+            "group-2",
+            ""
+          ],
+          "remove": [
+            "group-2"
+          ]
+        },
+        "userInfoGroups": [
+          "group-2",
+          ""
+        ]
+      }
+    },
+    "editorConfig": {
+      "actionLink": null,
+      "mode": "edit",
+      "lang": "zh",
+      "createUrl": "http://0.0.0.0:8989/create",
+      "templates": [
+        {
+          "image": "",
+          "title": "Blank",
+          "url": "http://0.0.0.0:8989/create"
+        },
+        {
+          "image": "http://0.0.0.0:8989/assets/images/file_docx.svg",
+          "title": "With sample content",
+          "url": "http://0.0.0.0:8989/create&sample=true"
+        }
+      ],
+      "user": {
+        "id": "uid-0",
+        "name": "Wesley Chang",
+        "group": "group-2"
+      },
+      "embedded": {
+        "saveUrl": "http://0.0.0.0:8989/static/docs/o2RnXsMA1HowxEx1zyokLw.docx",
+        "embedUrl": "http://0.0.0.0:8989/static/docs/o2RnXsMA1HowxEx1zyokLw.docx",
+        "shareUrl": "http://0.0.0.0:8989/static/docs/o2RnXsMA1HowxEx1zyokLw.docx",
+        "toolbarDocked": "top"
+      },
+      "customization": {
+        "about": true,
+        "comments": true,
+        "feedback": true,
+        "forcesave": true,
+        "submitForm": false,
+        "goback": {
+          "url": "http://0.0.0.0:8989"
+        }
+      }
+    }
+  },
+
+  "fileType": "word",
+  "apiUrl": "http://192.168.0.130/web-apps/apps/api/documents/api.js",
+  "dataInsertImage": {
+    "fileType": "png",
+    "url": "http://0.0.0.0:8989/assets/images/logo.png"
+  },
+  "dataCompareFile": {
+    "fileType": "docx",
+    "url": "http://0.0.0.0:8989/assets/static/sample.docx"
+  },
+  "dataMailMergeRecipients": {
+    "fileType": "csv",
+    "url": "http://0.0.0.0:8989/csv"
+  },
+  "usersForMentions": "[]"
+}
