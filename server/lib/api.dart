@@ -1,6 +1,7 @@
 import 'dart:io' show Directory, File, FileSystemEntity, FileSystemEntityType;
 
 import 'package:cloudoc/cloudoc.dart';
+import 'package:cloudoc/config.dart';
 import 'package:cloudoc/convert.dart' as c;
 import 'package:cloudoc/file_entity.dart';
 import 'package:cloudoc/meta.dart';
@@ -26,13 +27,6 @@ extension ResultExt<T> on Result<T> {
 
   Response get ok => response(200);
 }
-
-const _staticDataDirectories = {
-  'docs',
-  'sheets',
-  'slides',
-  'files',
-};
 
 Handler _createModelHandler(String name, String dir) {
   final rootDir = Directory(p.join(dir, name));
@@ -60,17 +54,17 @@ Handler _createModelHandler(String name, String dir) {
 Handler serve(ServeContext context) {
   final root = context.root;
   final router = context.router;
-  for (final name in _staticDataDirectories) {
+  for (final name in staticDocDirectories) {
     final dir = '$root/static/$name';
     if (!FileSystemEntity.isDirectorySync(dir)) {
       Directory(dir).createSync(recursive: true);
     }
-    final handler = createStaticHandler(dir);
-    router.get('/$name/<path|.*>', (Request req, String path) {
-      final r = req.change(path: name);
-      return handler(r);
-    });
   }
+  final handler = createStaticHandler('$root/static');
+  router.get('/static/<path|.*>', (Request req, String path) {
+    final r = req.change(path: 'static');
+    return handler(r);
+  });
 
   router.get('/api/desktop<path|.*>', _createModelHandler('desktop', root));
 
