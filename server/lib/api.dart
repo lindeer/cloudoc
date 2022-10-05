@@ -120,6 +120,8 @@ Handler serve(ServeContext context) {
     if (path.startsWith('/')) {
       path = path.substring(1);
     }
+    final params = req.requestedUri.queryParameters;
+    final deep = int.tryParse(params['deep'] ?? '0') ?? 0;
     final fsPath = p.join(root, Uri.decodeComponent(path));
     final type = FileSystemEntity.typeSync(fsPath, followLinks: false);
     if (type == FileSystemEntityType.notFound) {
@@ -133,7 +135,15 @@ Handler serve(ServeContext context) {
     } else {
       final f = File(fsPath);
       parent = f.parent;
+      final link = f.resolveSymbolicLinksSync();
       f.deleteSync(recursive: true);
+      final actualFile = File(link);
+      if (deep != 0 && actualFile.existsSync()) {
+        final fid = p.basenameWithoutExtension(link);
+        final meta = Meta(root);
+        meta.delete(fid);
+        actualFile.deleteSync(recursive: true);
+      }
     }
     final entities = listEntities(parent, root);
     return Result(entities).ok;

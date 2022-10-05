@@ -63,11 +63,14 @@ class Service {
     return list;
   }
 
-  Future<List<FileEntity>> delete(String path, {bool? resolveLink}) async {
+  Future<List<FileEntity>> delete(String path, {bool? permanently}) async {
     if (path.startsWith("/")) {
       path = path.substring(1);
     }
-    final url = Uri.http(authority, p.join('api/delete', path));
+    permanently ??= false;
+    final url = Uri.http(authority, p.join('api/delete', path), {
+      'deep': '${permanently ? 1 : 0}',
+    });
     final res = await http.delete(url);
     return _bodyToItems(
       res,

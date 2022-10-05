@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cloudoc/config.dart';
 import 'package:cloudoc/model.dart';
 import 'package:cloudoc_client/client/service.dart';
 import 'package:cloudoc/file_entity.dart';
@@ -47,7 +48,7 @@ void main() async {
     expect(remote.type, EntityType.folder);
   });
 
-  test('test create folder', () async {
+  test('test create folder2', () async {
     final entities = await service.create('desktop/$folder', 'folder');
     expect(entities.length, 3);
     final remote = entities.firstWhere((e) => e.name == folder);
@@ -85,30 +86,34 @@ void main() async {
     expect(file2.path, serverPath2);
   });
 
-  test('test delete directory', () async {
-    const name = 'deleting-folder';
-    final list1 = await service.create('/desktop/path/$name', 'folder');
-    final created = list1.firstWhere((e) => e.name == name);
-    expect(created.type, EntityType.folder);
-    final list2 = await service.delete('/desktop/path/$name');
+  test('test delete folder', () async {
+    final list2 = await service.delete('/desktop/$folder');
+    const name = folder;
     final names = list2.map((e) => e.name);
     expect(names.contains(name), false);
   });
 
-  test('test delete file', () async {
-    const filename = '用于测试.xlsx';
-    const serverDir = '/desktop/path';
-    final f = File('test/_test_/test_upload.xlsx');
-    final items = await service.upload(
-      [LocalFile(filename: filename, size: f.statSync().size, stream: f.openRead())],
-      serverDir,
-    );
-    final file = items.first;
-    final entities = await service.delete(file.path);
-    final names = entities.map((e) => e.name);
-    expect(names.contains(filename), false);
-    final ref = file.ref!;
-    File('test/_test_/$ref').deleteSync();
+  test('test delete files', () async {
+    const f1 = 'test_upload.xlsx';
+    const f2 = 'test_upload(1).xlsx';
+    const serverDir = '/desktop/path/to';
+    final file1 = File('test/_test_$serverDir/$f1');
+    final file2 = File('test/_test_$serverDir/$f2');
+    final link1 = file1.resolveSymbolicLinksSync();
+    final link2 = file2.resolveSymbolicLinksSync();
+    final id1 = p.basenameWithoutExtension(link1);
+    final id2 = p.basenameWithoutExtension(link2);
+    print("l1=$link1, l2=$link2, id1=$id1, id2=$id2");
+
+    await Future.wait([
+      service.delete('$serverDir/$f1', permanently: true),
+      service.delete('$serverDir/$f2', permanently: true),
+    ]);
+
+    expect(File(link1).existsSync(), false);
+    expect(File(link2).existsSync(), false);
+    expect(Directory(p.join('test/_test_', historyDir, id1)).existsSync(), false);
+    expect(Directory(p.join('test/_test_', historyDir, id2)).existsSync(), false);
   });
 
   tearDownAll(() {

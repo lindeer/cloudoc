@@ -30,6 +30,14 @@ class Meta {
     return file;
   }
 
+  void delete(String fid) {
+    final dir = p.join(_root, historyDir, fid);
+    final d = Directory(dir);
+    if (d.existsSync()) {
+      d.deleteSync(recursive: true);
+    }
+  }
+
   static String get now {
     final t = DateTime.now();
     return '${t.year}-${t.month.pad}-${t.day.pad} ${t.hour.pad}:${t.minute.pad}:${t.second.pad}';
