@@ -24,8 +24,6 @@
  *
 *-->
 
-{% load static %}
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -36,9 +34,9 @@
     <meta name="mobile-web-app-capable" content="yes" />
     <title>ONLYOFFICE</title>
     <link rel="icon"
-        href="{% static 'images/'|add:fileType|add:'.ico' %}"
+        href="{{ ('images/' + fileType + '.ico') | resolveAsset }}"
         type="image/x-icon" />
-    <link rel="stylesheet" type="text/css" href="{% static "css/editor.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{{ 'css/editor.css' | resolveAsset }}" />
 </head>
 <body>
     <div class="form">
