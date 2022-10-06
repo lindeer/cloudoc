@@ -1,11 +1,12 @@
 import 'dart:convert' show json;
-import 'dart:io' show File, FileSystemEntity, FileSystemEntityType;
+import 'dart:io' show File, FileSystemEntity, FileSystemEntityType, Platform;
 
 import 'package:cloudoc/config.dart';
 import 'package:cloudoc/meta.dart';
 import 'package:cloudoc_server/file_id.dart';
 import 'package:path/path.dart' as p;
 import 'package:shelf/shelf.dart' show Handler, Request, Response;
+import 'package:shelf_static/shelf_static.dart' show createStaticHandler;
 
 import 'src/ext.dart';
 import 'src/serve_context.dart';
@@ -25,6 +26,13 @@ String _serverUrl(Request req) {
 Handler serve(ServeContext context) {
   final root = context.root;
   final router = context.router;
+
+  final packageDir = p.normalize(p.join(p.dirname(Platform.script.path), '..'));
+  final resHandler = createStaticHandler(p.join(packageDir, 'res', 'static'));
+  router.get('/res/<path|.*>', (Request req, String path) {
+    final r = req.change(path: 'res');
+    return resHandler(r);
+  });
 
   router.get('/edit', (Request req) {
     final params = req.requestedUri.queryParameters;

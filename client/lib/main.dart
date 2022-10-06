@@ -41,7 +41,8 @@ class _BrowserPage extends StatefulWidget {
 }
 
 class _BrowserPageState extends State<_BrowserPage> {
-  final _model = FileBrowserModel(Service("0.0.0.0:8989"));
+  static const _domain = '192.168.0.130:8989';
+  final _model = FileBrowserModel(Service(_domain));
 
   @override
   void initState() {
@@ -91,7 +92,7 @@ class _BrowserPageState extends State<_BrowserPage> {
       default:
         final file = p.join(_model.path, entity.name);
         launchUrl(
-          Uri.parse('http://0.0.0.0:8989/edit?file=$file'),
+          Uri.parse('http://$_domain/edit?file=$file'),
         );
         break;
     }
