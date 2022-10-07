@@ -7,9 +7,9 @@ import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as p;
 
 class Service {
-  final String authority;
+  final Uri baseUrl;
 
-  Service(this.authority);
+  const Service(this.baseUrl);
 
   static List<T> _bodyToItems<T>(http.BaseResponse res, String body, String errMsg) {
     final status = res.statusCode;
@@ -22,7 +22,7 @@ class Service {
   }
 
   Future<List<FileEntity>> listEntities(String path) async {
-    final res = await http.get(Uri.http(authority, 'api/$path'));
+    final res = await http.get(baseUrl.replace(path: 'api/$path'));
     return _bodyToItems<FileEntity>(
       res,
       res.body,
@@ -32,7 +32,7 @@ class Service {
 
   Future<List<FileEntity>> create(String path, String type) async {
     final res = await http.post(
-      Uri.http(authority, 'api/create'),
+      baseUrl.replace(path: 'api/create'),
       headers: const {
         "Content-Type": "application/json",
       },
@@ -46,7 +46,7 @@ class Service {
   }
 
   Future<List<RemoteFile>> upload(List<LocalFile> files, String remote) async {
-    final url = Uri.http(authority, 'api/upload');
+    final url = baseUrl.replace(path: 'api/upload');
     final req = http.MultipartRequest("POST", url);
     req.files.addAll(files.map((f) => http.MultipartFile(
       remote,
@@ -68,7 +68,8 @@ class Service {
       path = path.substring(1);
     }
     permanently ??= false;
-    final url = Uri.http(authority, p.join('api/delete', path), {
+    final urlPath = p.join('api/delete', path);
+    final url = baseUrl.replace(path: urlPath, queryParameters: {
       'deep': '${permanently ? 1 : 0}',
     });
     final res = await http.delete(url);

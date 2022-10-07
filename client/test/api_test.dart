@@ -17,7 +17,7 @@ void main() async {
       .addHandler(api.serve(ServeContext(root: 'test/_test_', docServer: '0.0.0.0')));
   const port = 8964;
   final server = await io.serve(handler, '0.0.0.0', port);
-  final service = Service('0.0.0.0:$port');
+  final service = Service(Uri.parse('http://0.0.0.0:$port'));
 
   const folder = 'new1';
   final d = Directory('test/_test_/desktop/$folder');
