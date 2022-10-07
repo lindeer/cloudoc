@@ -13,4 +13,6 @@ class ServeContext {
   });
 
   String get docApi => '$docServer/web-apps/apps/api/documents/api.js';
+
+  String get commandApi => '$docServer/coauthoring/CommandService.ashx';
 }

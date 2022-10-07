@@ -11,6 +11,7 @@ import 'package:shelf_static/shelf_static.dart' show createStaticHandler;
 import 'src/ext.dart';
 import 'src/serve_context.dart';
 import 'src/template_editor.dart' as editor;
+import 'track.dart';
 
 Response _html(String html) {
   return Response.ok(html, headers: {
@@ -33,6 +34,8 @@ Handler serve(ServeContext context) {
     final r = req.change(path: 'res');
     return resHandler(r);
   });
+
+  final mt = Meta(root);
 
   router.get('/edit', (Request req) {
     final params = req.requestedUri.queryParameters;
@@ -66,11 +69,14 @@ Handler serve(ServeContext context) {
     final edType = webTypes.contains(typeParam) ? typeParam! : 'desktop';
     final lang = params['ulang'] ?? 'zh';
 
-    final mt = Meta(root);
     final meta = mt.from(fid);
     final anchorData = params['actionLink'];
     final anchor = anchorData == null ? null : json.decode(anchorData);
     final createUrl = '$baseUrl/create';
+    final callbackUrl = Uri.parse('$baseUrl/track').replace(queryParameters: {
+      'file': path,
+      'uid': user.id,
+    });
     /*
     final image = fileImages[fileType] ?? 'file_docx.svg';
     final imageUrl = '$baseUrl/assets/images/$image';
@@ -128,8 +134,7 @@ Handler serve(ServeContext context) {
         'actionLink': anchor,
         'mode': mode,
         'lang': lang,
-        // TODO: callback url
-        //'callbackUrl': docManager.getCallbackUrl(filename, request),
+        'callbackUrl': '$callbackUrl',
         'createUrl': createUrl,
         // 'templates': templates,
         'user': {
@@ -184,6 +189,42 @@ Handler serve(ServeContext context) {
       'dataMailMergeRecipients': json.encode(dataMailMergeRecipients),
       'usersForMentions': json.encode(usersForMentions),
     }));
+  });
+
+  final tracker = Tracker(root, mt);
+
+  router.post('/track', (Request req) async {
+    final params = req.requestedUri.queryParameters;
+    int err = 0;
+    final res = <String, dynamic>{};
+    final str = await req.readAsString();
+    print("/track: body=$str");
+    final body = json.decode(str);
+    final status = body['status'] ?? 0;
+    try {
+      if (status == 1) {
+        final action = body['actions'];
+        if (action != null && action[0]['type'] == 0) {
+          final uid = action[0]['userid'];
+          if (!body['users'].contains(uid)) {
+            tracker.commandRequest(context.commandApi, 'forcesave', body['key'] ?? '');
+          }
+        }
+      }
+      if (status == 2 || status == 3) {
+        tracker.save(body, params);
+      } else if (status == 6 || status == 7) {
+        tracker.forceSave(body, params);
+      }
+    } on Exception catch (e) {
+      err = 1;
+      res['message'] = e.toString();
+    }
+
+    res['error'] = err;
+    return Response(err == 0 ? 200 : 500, headers: {
+      'content_type': 'application/json'
+    }, body: json.encode(res));
   });
 
   return router;

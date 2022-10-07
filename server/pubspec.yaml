@@ -17,6 +17,7 @@ dependencies:
   shelf_multipart: 1.0.0
   any_base: 2.0.0
   uuid: 3.0.6
+  http: 0.13.5
   jinja:
     git: https://lindeer:cljs118!@gitee.com/lindeer/jinja.dart.git
 
