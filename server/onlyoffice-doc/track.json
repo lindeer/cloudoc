@@ -1,0 +1,30 @@
+{
+  "key": "988229585",
+  "status": 2,
+  "url": "http://localhost/cache/files/988229585_3637/output.xlsx/output.xlsx?md5=vKjeilsLPDITn_dPfzzdNA&expires=1665196808&filename=output.xlsx",
+  "changesurl": "http://localhost/cache/files/988229585_3637/changes.zip/changes.zip?md5=RAovJAhvbOZ6WY1YsvoEPA&expires=1665196808&filename=changes.zip",
+  "history": {
+    "serverVersion": "7.1.1",
+    "changes": [
+      {
+        "created": "2022-10-08 02:17:36",
+        "user": {
+          "id": "uid-0",
+          "name": "group-2 Wesley Chang"
+        }
+      }
+    ]
+  },
+  "users": [
+    "uid-0"
+  ],
+  "actions": [
+    {
+      "type": 0,
+      "userid": "uid-0"
+    }
+  ],
+  "lastsave": "2022-10-08T02:21:53.000Z",
+  "notmodified": false,
+  "filetype": "xlsx"
+}
