@@ -13,6 +13,7 @@ const _defaultPort = 8989;
 void main(List<String> args) {
   String? dir;
   String? p;
+  String? docServer;
   final it = args.iterator;
   while (it.moveNext()) {
     final opt = it.current;
@@ -22,15 +23,25 @@ void main(List<String> args) {
         it.moveNext();
         p = it.current;
         break;
+      case '-s':
+      case '--server':
+        it.moveNext();
+        docServer = it.current;
+        break;
       default:
         dir = opt;
     }
   }
 
+  if (docServer == null) {
+    print('Exit: please specify document server address, e.g. http://192.168.104.249:8990');
+    return;
+  }
+
   dir ??= _dataRoot;
   final context = ServeContext(
     root: '$dir/data',
-    docServer: 'http://192.168.0.130',
+    docServer: docServer,
   );
 
   api.serve(context);

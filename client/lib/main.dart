@@ -41,7 +41,7 @@ class _BrowserPage extends StatefulWidget {
 }
 
 class _BrowserPageState extends State<_BrowserPage> {
-  static final _baseUrl = Uri.parse('http://192.168.0.130:8989');
+  static final _baseUrl = Uri.parse('http://192.168.104.249:8989');
   final _model = FileBrowserModel(Service(_baseUrl));
 
   @override
