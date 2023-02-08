@@ -1,10 +1,10 @@
-A corss platform flutter app for browsing, saving and editing online documents, including server, powered by onlyoffice.
+A cross platform flutter app for browsing, saving and editing online documents, including server, powered by onlyoffice.
 
 Also a convenient tool to set up a personal cloud-document space.
 
-![cloudoc demo](docs/cloudoc-demo.png)
+![cloudoc demo](doc/cloudoc-demo.png)
 
-![edit a word file](docs/cloudoc-editing.png)
+![edit a word file](doc/cloudoc-editing.png)
 
 # Server setup
 
