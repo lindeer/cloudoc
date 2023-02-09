@@ -1,6 +1,6 @@
 name: cloudoc
 description: A cross platform flutter app for browsing, saving and editing online documents(word,spreadsheet,slide), including server.
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/lindeer/cloudoc
 
 environment:

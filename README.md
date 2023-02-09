@@ -24,4 +24,4 @@ Now that onlyoffice doucmentserver is ready, we start to run cloudoc. cloudoc is
 
 Do as flutter [doc](https://docs.flutter.dev/get-started/install) said.
 
-`flutter run -d chrome` would start a web page in browser, while other platform is available with `-d` options.
+`cd client` and `flutter run -d chrome` would start a web page in browser, while other platform is available with `-d` options.
