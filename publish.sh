@@ -18,6 +18,7 @@ if [[ -z "$DRY_RUN" ]]; then
   if [[ -z "$http_proxy" ]]; then
     echo "\$http_proxy is empty, uploading may have trouble, set http://127.0.0.1:7890."
     export http_proxy="http://127.0.0.1:7890"
+    export https_proxy="https://127.0.0.1:7890"
   fi
 else
   echo "Test publishing ..."
